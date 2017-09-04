@@ -68,7 +68,7 @@ std::map<std::string, std::string> Request::getParams(  ) {
 	std::vector<std::string> pairs;
 	std::map<std::string, std::string> kvr;
 
-	pairs = {std::sregex_token_iterator (uristr.begin(), uristr.end(), std::regex("[&]"), -1), std::sregex_token_iterator()};
+	pairs = std::vector<std::string>(std::sregex_token_iterator (uristr.begin(), uristr.end(), std::regex("[&]"), -1), std::sregex_token_iterator());
 	for (auto &pair : pairs) {
 		auto k = uridecode(pair.substr(0,pair.find("="))); 
 		auto v = uridecode(pair.substr(pair.find("=")+1));
