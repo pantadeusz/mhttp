@@ -42,6 +42,12 @@ target_link_libraries(mhttpapp mhttp)
 add_executable(mhttp_tests ${mhttptest_SOURCES})
 target_link_libraries(mhttp_tests mhttp)
 
+
+enable_testing()
+
+add_test( mhttp_tests mhttp_tests )
+
+
 #install(TARGETS myExe mySharedLib myStaticLib
 #        RUNTIME DESTINATION bin
 #        LIBRARY DESTINATION lib
