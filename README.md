@@ -1,5 +1,6 @@
 # mhttp
 
+[![Build Status](https://travis-ci.org/pantadeusz/mhttp.svg?branch=master)](https://travis-ci.org/pantadeusz/mhttp)
 
 ### by Tadeusz Puźniakowski, 2017
 
