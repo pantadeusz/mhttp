@@ -32,10 +32,10 @@ using namespace tp::http;
 using namespace std;
 
 int main ( int argc, char **argv ) {
-	Http srv( "localhost", 8090, true );
+    Http srv( "localhost", 8090, true );
     srv.GET("/(.*)",getStaticFileHandler("",true));
     srv.start();
-	return 0;
+    return 0;
 }
 ```
 
@@ -49,13 +49,13 @@ using namespace tp::http;
 using namespace std;
 
 int main ( int argc, char **argv ) {
-	Http srv( "localhost", 8090, true );
+    Http srv( "localhost", 8090, true );
     srv.filter_GET("/", [&]( Request &req )->void {
         req.queryString = "/index.html";
     });
     srv.GET("/(.*)",getStaticFileHandler("",true));
     srv.start();
-	return 0;
+    return 0;
 }
 ```
 
@@ -69,12 +69,12 @@ using namespace tp::http;
 using namespace std;
 
 int main ( int argc, char **argv ) {
-	Http srv( "localhost", 8090, true );
+    Http srv( "localhost", 8090, true );
     srv.GET( "/hello", [&]( Request &req )->t_Response {
         return ResponseFactory::response("Hello server");
     } );
     srv.start();
-	return 0;
+    return 0;
 }
 ```
 
@@ -89,7 +89,7 @@ using namespace tp::http;
 using namespace std;
 
 int main ( int argc, char **argv ) {
-	Http srv( "localhost", 8090, true );
+    Http srv( "localhost", 8090, true );
     auto handler = []( Request &req )->t_Response {
         std::stringstream ss;
         ss << "<p>Hello world!!</p><table>";
@@ -100,6 +100,7 @@ int main ( int argc, char **argv ) {
     srv.GET( "/hello", handler );
     srv.POST( "/hello", handler );
     srv.start();
+    return 0;
 }
 ```
 
