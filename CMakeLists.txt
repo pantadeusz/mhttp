@@ -6,6 +6,10 @@ project (mhttp CXX)
 set (mhttp_VERSION_MAJOR 0)
 execute_process(COMMAND ./generateVersion.sh OUTPUT_VARIABLE mhttp_VERSION_MINOR)
 
+install(DIRECTORY src/ DESTINATION include/mhttp
+        FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY ./ DESTINATION lib
+        FILES_MATCHING PATTERN "*.so")
 
 add_definitions(-std=c++11)
 add_definitions(-Wall)
@@ -21,7 +25,7 @@ FIND_PACKAGE( OpenMP)
  include_directories(SYSTEM ${OpenMP_INCLUDE_PATH})
 
 
-include_directories("${PROJECT_BINARY_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/catch")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/fakeit")
@@ -47,9 +51,3 @@ enable_testing()
 
 add_test( mhttp_tests mhttp_tests )
 
-
-#install(TARGETS myExe mySharedLib myStaticLib
-#        RUNTIME DESTINATION bin
-#        LIBRARY DESTINATION lib
-#        ARCHIVE DESTINATION lib/static)
-#
