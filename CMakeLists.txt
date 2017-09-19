@@ -8,8 +8,8 @@ execute_process(COMMAND ./generateVersion.sh OUTPUT_VARIABLE mhttp_VERSION_MINOR
 
 install(DIRECTORY src/ DESTINATION include/mhttp
         FILES_MATCHING PATTERN "*.hpp")
-install(DIRECTORY ./ DESTINATION lib
-        FILES_MATCHING PATTERN "*.so")
+# install(DIRECTORY ./ DESTINATION lib
+#         FILES_MATCHING PATTERN "*.so")
 
 add_definitions(-std=c++11)
 add_definitions(-Wall)
@@ -39,6 +39,7 @@ set(mhttp_SOURCES main.cpp)
 
 # add_library(mhttp ${mhttplib_SOURCES})
 add_library(mhttp SHARED ${mhttplib_SOURCES})
+install (TARGETS mhttp DESTINATION lib)
 
 add_executable(mhttpapp ${mhttp_SOURCES})
 target_link_libraries(mhttpapp mhttp)
