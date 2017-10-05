@@ -218,15 +218,14 @@ t_Response Http::processRequests(const Request req) {
 	return response;
 }
 
-int Http::sendResponse(SocketInterface & clientsocket, t_Response response) {
-	auto &resp = *(response.get());
+int Http::sendResponse(SocketInterface & clientsocket, t_Response resp) {
 	std::stringstream sent;
 	// std::to_string(
-	sent << "HTTP/1.1 " <<  resp.code  << " - " << resp.codeComment;
+	sent << "HTTP/1.1 " <<  resp.getCode()  << " - " << resp.getCodeComment();
 	sent << "\r\nServer: PuzniakowskiHttp " << VER;
 	//sent << "\r\nServer: PuzniakowskiHttp ";
 	sent << "\r\nConnection: close";
-	for (auto & h : resp.header) {
+	for (auto & h : resp.getHeader()) {
 		sent << "\r\n" << h.first << ": " << h.second;
 	}
 	sent << "\r\n\r\n";

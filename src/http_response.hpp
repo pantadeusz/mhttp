@@ -39,29 +39,72 @@ class Response {
     
 public:
     
-    int code;
-    std::string codeComment;
-	std::map < std::string, std::string > header;
     /**
      * Returns fragment of response body
      */
-    virtual std::vector < char > getBytes(size_t partSize ) = 0;
     Response();
     virtual ~Response();
 
+    virtual std::vector < char > getBytes(size_t partSize ) = 0;
+
+    virtual int &getCode()  = 0;
+    virtual std::string &getCodeComment()  = 0;
+    virtual std::map < std::string, std::string > &getHeader()  = 0;
+
+    virtual int getCode() const = 0;
+    virtual std::string getCodeComment() const = 0;
+    virtual std::map < std::string, std::string > getHeader() const = 0;
+
+    
 };
 
 
 
 class ResponseStringStream : public Response {
 public:
+    int _code;
+    std::string _codeComment;
+	std::map < std::string, std::string > _header;
+
     std::stringstream ss;
     std::vector < char > getBytes(size_t partSize);
+
+    int getCode() const;
+    std::string getCodeComment() const;
+    std::map < std::string, std::string > getHeader() const;
+    int &getCode() ;
+    std::string &getCodeComment() ;
+    std::map < std::string, std::string > &getHeader() ;
+
+    ResponseStringStream() {
+        _code = 200;
+        _codeComment = "ok";
+        _header["Content-Type"] = "text/html; charset=utf8";
+    }    
+};
+
+class t_Response : public Response {
+public:
+    std::shared_ptr<Response> p_Response;
+    std::vector < char > getBytes(size_t partSize );
+    int &getCode() ;
+    std::string &getCodeComment() ;
+    std::map < std::string, std::string > &getHeader() ;
+    int getCode() const;
+    std::string getCodeComment() const;
+    std::map < std::string, std::string > getHeader() const;
+
+    t_Response(Response *newResponsePointer) : p_Response(newResponsePointer) {
+
+    }
+    t_Response() {
+        
+    }
 };
 
 //std::shared_ptr<Response> newResponsePtr(std::string responseType);
-typedef std::shared_ptr<Response> t_Response;
-std::ostream& operator << ( std::ostream& os, t_Response const& value_ );
+// typedef std::shared_ptr<Response> t_Response;
+std::ostream& operator << ( std::ostream& os, t_Response & value_ );
 
 
 class ResponseFactory {
