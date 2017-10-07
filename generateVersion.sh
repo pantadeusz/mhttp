@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo -n 1
+X=$(git log | grep ^commit | wc -l)
+echo -n $X

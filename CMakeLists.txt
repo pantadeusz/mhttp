@@ -6,11 +6,6 @@ project (mhttp CXX)
 set (mhttp_VERSION_MAJOR 0)
 execute_process(COMMAND ./generateVersion.sh OUTPUT_VARIABLE mhttp_VERSION_MINOR)
 
-install(DIRECTORY src/ DESTINATION include/mhttp
-        FILES_MATCHING PATTERN "*.hpp")
-# install(DIRECTORY ./ DESTINATION lib
-#         FILES_MATCHING PATTERN "*.so")
-
 add_definitions(-std=c++11)
 add_definitions(-Wall)
 add_definitions(-DVER=${mhttp_VERSION_MAJOR}.${mhttp_VERSION_MINOR})
@@ -24,8 +19,6 @@ FIND_PACKAGE( OpenMP)
   endif()
  include_directories(SYSTEM ${OpenMP_INCLUDE_PATH})
 
-
-include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/catch")
 include_directories("${PROJECT_SOURCE_DIR}/thirdparty/fakeit")
@@ -39,7 +32,9 @@ set(mhttp_SOURCES main.cpp)
 
 # add_library(mhttp ${mhttplib_SOURCES})
 add_library(mhttp SHARED ${mhttplib_SOURCES})
-install (TARGETS mhttp DESTINATION lib)
+install(TARGETS mhttp DESTINATION lib)
+install(DIRECTORY src/ DESTINATION include/mhttp
+        FILES_MATCHING PATTERN "*.hpp")
 
 add_executable(mhttpapp ${mhttp_SOURCES})
 target_link_libraries(mhttpapp mhttp)
@@ -51,4 +46,12 @@ target_link_libraries(mhttp_tests mhttp)
 enable_testing()
 
 add_test( mhttp_tests mhttp_tests )
+
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Tadeusz Puźniakowski")
+ 
+INCLUDE(CPack)
+ 
+# To use this:
+# make package
 
