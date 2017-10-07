@@ -4,24 +4,11 @@
 
     This file is part of mhttp.
 
-	This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-	you can contact me via http://www.puzniakowski.pl
-
+    This file is an example usage of Http class. You can use it like a part of documentation, you can 
+    copy, modify and incorporate in other projects without any limitation.
+      
+    
 */
-
-/* This file is an example usage of Http class */
 
 #include <iostream>
 #include <sstream>
