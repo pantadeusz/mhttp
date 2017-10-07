@@ -8,7 +8,7 @@ execute_process(COMMAND ./generateVersion.sh OUTPUT_VARIABLE mhttp_VERSION_MINOR
 
 add_definitions(-std=c++11)
 add_definitions(-Wall)
-add_definitions(-DVER=${mhttp_VERSION_MAJOR}.${mhttp_VERSION_MINOR})
+add_definitions(-DVER="${mhttp_VERSION_MAJOR}.${mhttp_VERSION_MINOR}")
 
 FIND_PACKAGE( OpenMP)
   if(OPENMP_FOUND)
@@ -47,10 +47,16 @@ enable_testing()
 
 add_test( mhttp_tests mhttp_tests )
 
-SET(CPACK_GENERATOR "DEB")
+SET(CPACK_PACKAGE_VERSION_MAJOR ${mhttp_VERSION_MAJOR})
+SET(CPACK_PACKAGE_VERSION_MINOR ${mhttp_VERSION_MINOR})
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+SET(CPACK_GENERATOR "DEB" "TGZ")
+
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Tadeusz Puźniakowski")
- 
 INCLUDE(CPack)
+
+
  
 # To use this:
 # make package
