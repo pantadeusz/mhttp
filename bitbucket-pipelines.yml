@@ -13,5 +13,5 @@ pipelines:
           - apt-get update && apt-get install -y cmake
           # build
           - cmake CmakeLists.txt
-          - make
+          - make mhttp_tests
           - ./mhttp_tests

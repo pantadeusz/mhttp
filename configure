@@ -1,1 +1,1 @@
-cmake CMakeLists.txt
+cmake -DCMAKE_INSTALL_PREFIX:PATH=./build/mhttp
