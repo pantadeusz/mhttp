@@ -13,7 +13,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <http.hpp>
+#include <http_session.hpp>
 #include <chrono>
 #include <thread>
 #include <fstream>
@@ -24,7 +24,7 @@ using namespace std;
 
 int main ( int argc, char **argv ) {
     {
-	Http srv( "localhost", 8090, true );
+	HttpWithSession srv( "localhost", 8090, true );
     bool loggedin = false;
     
     srv.filter_GET("/", [&]( Request &req )->void {
@@ -38,6 +38,16 @@ int main ( int argc, char **argv ) {
     srv.GET( "/login", [&loggedin]( Request &req )->t_Response {
         loggedin = true;
         return ResponseFactory::response("Logged in :D");
+    } );
+
+    srv.sGET( "/session", [&loggedin]( Request &req, Session &session )->t_Response {
+        if (session.getSessionData() == NULL) {
+            session.setSessionData(new StringSessionData());
+            session.getSessionData()->fromString("x");
+        }
+        auto sd = session.getSessionData();
+        sd->fromString(sd->toString() + " x");
+        return ResponseFactory::response("Session ID = " + sd->toString());
     } );
     srv.GET( "/hello", []( Request &req )->t_Response {
         std::stringstream ss;
@@ -56,7 +66,7 @@ int main ( int argc, char **argv ) {
     t.detach();
 
     // just for test purposes:
-    {
+    if (1 == 2) { // you can execute simple query
         Request req;
         req.method = "GET";
         req.proto = "HTTP/1.1";
