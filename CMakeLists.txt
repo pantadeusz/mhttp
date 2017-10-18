@@ -6,7 +6,7 @@ project (mhttp CXX)
 set (mhttp_VERSION_MAJOR 0)
 execute_process(COMMAND ./generateVersion.sh OUTPUT_VARIABLE mhttp_VERSION_MINOR)
 
-add_definitions(-std=c++11)
+add_definitions(-std=c++17)
 add_definitions(-Wall)
 add_definitions(-DVER="${mhttp_VERSION_MAJOR}.${mhttp_VERSION_MINOR}")
 
