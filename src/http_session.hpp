@@ -51,6 +51,16 @@ public:
 	virtual void fromString(const std::string  &str) = 0;
 };
 
+class StringSessionData : public i_SessionData {
+public:
+	std::string data;
+	std::string toString() {
+		return data;
+	}
+	void fromString(const std::string  &str) {
+		data = str;
+	}
+};
 /**
  * The session meta data. It records session ID, timestamp of session creation and 
  * session data.
@@ -61,8 +71,8 @@ protected:
 	std::string _id;
 public:
 	std::shared_ptr < i_SessionData > data;
-	virtual i_SessionData &getSessionData() {
-		return *data.get();
+	virtual i_SessionData *getSessionData() {
+		return data.get();
 	}
 
 	virtual void setSessionData(i_SessionData *d) {
@@ -92,6 +102,8 @@ public:
 
 class SessionStorage : public i_SessionStorage {
 protected:
+	std::mutex session_mutex;
+	
 	std::unordered_map< std::string, Session > sessions;
 	std::random_device r;
 	std::default_random_engine e1;
@@ -110,7 +122,7 @@ public:
 class HttpWithSession : public Http {
 private:
 // std::function < t_Response ( Request &, Session & )>
-public:
+public:	
 	SessionStorage sessionStorage;
 	
 	Session &getSession(tp::http::Request &req) {
@@ -120,15 +132,9 @@ public:
 		return sessionStorage.storeSessionForRequest(session, res);
 	}
 
-	void GET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
-		Http::GET(mapping, [&f,this]( Request & req) -> t_Response {
-			auto &session = sessionStorage.getSessionForRequest(req);
-			auto res = f(req, session);
-			return sessionStorage.storeSessionForRequest(session, res);
-		});
-	}
-	
-	// void POST( const std::string &mapping, std::function < t_Response ( Request &, Session & )> f );
+	void sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
+
+	void sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
 
 
 	HttpWithSession  (std::string hostname = "localhost", int port = 8080, int async = false) 

@@ -36,6 +36,7 @@ namespace http {
         virtual int write (const void * buf, size_t bufsize) = 0;
         virtual int read(void * buf, size_t bufsize) = 0;
         virtual int close() = 0;
+        virtual int shutdonwOut() = 0;
         virtual std::string getHost() = 0;
     };
 
@@ -58,6 +59,7 @@ namespace http {
     
         int read (void * buf, size_t bufsize);
         int close ();
+        int shutdonwOut();
         std::string getHost() {return _host;};
         
     };

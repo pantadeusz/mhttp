@@ -29,10 +29,12 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-
+#include <chrono>
+#include <thread>
 
 using namespace fakeit;
 using namespace tp::http;
+using namespace std::chrono_literals;
 
 TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
     errlog = [](const std::string & e){};
@@ -41,13 +43,16 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
     port++;
     HttpWithSession srv( "localhost", port, true );
     
-    srv.GET( "/", []( Request &req, Session session )->t_Response {
+    srv.sGET( "/", []( Request &req, Session session )->t_Response {
         return ResponseFactory::response(session.getId());
+    } );
+    srv.GET( "/nosess", []( Request &req )->t_Response {
+        return ResponseFactory::response("no session");
     } );
 
     std::thread t([&](){srv.start();});
     t.detach();
-
+    std::this_thread::sleep_for(1s);
     SECTION("setting up session cookie") {
         Request req;
         req.method = "GET";
@@ -58,12 +63,45 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
         std::stringstream ss;
         ss << res1;
         std::string sessionID = ss.str();
-        for (auto h : res1.getHeader()) {
-            std::cout << "h: " << h.first << " = " << h.second << std::endl;
-        }
+        //for (auto h : res1.getHeader()) {
+        //    std::cout << "h: " << h.first << " = " << h.second << std::endl;
+        //}
         REQUIRE(("sessionId="+sessionID)==res1.getHeader()["set-cookie"]);
     }
 
+
+    SECTION("session persist between requests") {
+        Request req;
+        req.method = "GET";
+        req.proto = "HTTP/1.1";
+        req.queryString = "/";
+        req.remoteAddress = "localhost:" + std::to_string(port);
+        t_Response res1 = Http::doHttpQuery(req);
+        std::string setCookieString = res1.getHeader()["set-cookie"];
+        std::stringstream ss;
+        ss << res1;
+        std::string sessionID = ss.str();
+//        for (auto h : res1.getHeader()) {
+//            std::cout << "h: " << h.first << " = " << h.second << std::endl;
+//        }
+        REQUIRE(("sessionId="+sessionID)==setCookieString);
+        Request req2;
+        req2.method = "GET";
+        req2.proto = "HTTP/1.1";
+        req2.queryString = "/";
+        req2.remoteAddress = "localhost:" + std::to_string(port);
+        req2.header["cookie"] = setCookieString;
+        t_Response res2 = Http::doHttpQuery(req2);
+        std::stringstream ss2;
+        ss2 << res2;
+        std::string sessionID2 = ss2.str();
+//         for (auto h : res2.getHeader()) {
+//             std::cout << "h2: " << h.first << " = " << h.second << std::endl;
+//         }
+//         std::cout << "assertion" << std::endl;
+        REQUIRE(("sessionId="+sessionID2)==res2.getHeader()["set-cookie"]);
+        REQUIRE(sessionID2==sessionID);
+    }
     srv.stop();
 
 }

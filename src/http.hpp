@@ -96,9 +96,9 @@ public:
 	/**
 	 * adds new handler for url.
 	 */
-	void GET( const std::string &mapping, t_requHandler f );
-	void POST( const std::string &mapping, t_requHandler f );
-	void DELETE( const std::string &mapping, t_requHandler f );
+	virtual void GET( const std::string &mapping, t_requHandler f );
+	virtual void POST( const std::string &mapping, t_requHandler f );
+	virtual void DELETE( const std::string &mapping, t_requHandler f );
 	
 	/**
 	 * adds new handler for url.
