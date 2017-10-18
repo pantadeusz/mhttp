@@ -61,6 +61,7 @@ public:
 		data = str;
 	}
 };
+
 /**
  * The session meta data. It records session ID, timestamp of session creation and 
  * session data.

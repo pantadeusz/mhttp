@@ -43,12 +43,12 @@ int main ( int argc, char **argv ) {
     srv.sGET( "/session", [&loggedin]( Request &req, Session &session )->t_Response {
         if (session.getSessionData() == NULL) {
             session.setSessionData(new StringSessionData());
-            session.getSessionData()->fromString("x");
         }
         auto sd = session.getSessionData();
-        sd->fromString(sd->toString() + " x");
+        sd->fromString(sd->toString() + "x "); // append x to session data string
         return ResponseFactory::response("Session ID = " + sd->toString());
     } );
+    
     srv.GET( "/hello", []( Request &req )->t_Response {
         std::stringstream ss;
         ss << "<p>Hello world!!</p><table>";
