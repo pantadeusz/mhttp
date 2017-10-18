@@ -396,7 +396,9 @@ t_Response Http::doHttpQuery(Request req) {
 	std::string rcomment;
 	std::stringstream ss( trim( response ) );
 	ss >> rproto >> rcode >>  rcomment;
-	return ResponseFactory::response(data,rcode, rcomment);
+	auto ret = ResponseFactory::response(data,rcode, rcomment);
+	ret.getHeader() = header;
+	return ret;
 }
 }
 }

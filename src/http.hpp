@@ -36,11 +36,8 @@
 #include <vector>
 #include <future>
 #include <utility>
-
-#include <netinet/in.h>
-#include <signal.h>
 #include <regex>
-
+#include <signal.h>
 
 namespace tp {
 	namespace http {
