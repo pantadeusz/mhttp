@@ -52,7 +52,7 @@ HttpWithSession::HttpWithSession  ( std::string hostname, int port, int async, i
 
 
 void HttpWithSession::sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
-	Http::GET( mapping, [&f, this]( Request & req ) -> t_Response {
+	Http::GET( mapping, [f, this]( Request & req ) -> t_Response {
 		auto &session = getSession( req );
 		auto res = f( req, session );
 		auto ret = saveSession( session, res );
@@ -61,7 +61,7 @@ void HttpWithSession::sGET( const std::string &mapping, std::function < t_Respon
 }
 
 void HttpWithSession::sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
-	Http::POST( mapping, [&f, this]( Request & req ) -> t_Response {
+	Http::POST( mapping, [f, this]( Request & req ) -> t_Response {
 		auto &session = getSession( req );
 		auto res = f( req, session );
 		auto ret = saveSession( session, res );
@@ -71,7 +71,7 @@ void HttpWithSession::sPOST( const std::string &mapping, std::function < t_Respo
 
 
 void HttpWithSession::sDELETE( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
-	Http::DELETE( mapping, [&f, this]( Request & req ) -> t_Response {
+	Http::DELETE( mapping, [f, this]( Request & req ) -> t_Response {
 		auto &session = getSession( req );
 		auto res = f( req, session );
 		auto ret = saveSession( session, res );
@@ -81,9 +81,9 @@ void HttpWithSession::sDELETE( const std::string &mapping, std::function < t_Res
 
 
 void HttpWithSession::filter_sGET( const std::string &mapping, std::function < void( Request &, Session & ) > f ) {
-	Http::filter_GET( mapping, [&f, this]( Request & req ) {
+	Http::filter_GET( mapping, [f, this]( Request & req ) {
 		auto &session = getSession( req );
-		if (req.header["cookie"].size() > 0) {
+		if (req.header["cookie"].size() > 0) {			
 			if (req.header["cookie"].find("sessionId") == std::string::npos) {
 				req.header["cookie"] = req.header["cookie"] + "; sessionId="+session.getId();
 			}
@@ -94,7 +94,7 @@ void HttpWithSession::filter_sGET( const std::string &mapping, std::function < v
 	} );
 }
 void HttpWithSession::filter_sPOST( const std::string &mapping, std::function < void( Request &, Session & ) > f ){
-	Http::filter_POST( mapping, [&f, this]( Request & req ) {
+	Http::filter_POST( mapping, [f, this]( Request & req ) {
 		auto &session = getSession( req );
 		if (req.header["cookie"].size() > 0) {
 			if (req.header["cookie"].find("sessionId") == std::string::npos) {
@@ -107,7 +107,7 @@ void HttpWithSession::filter_sPOST( const std::string &mapping, std::function < 
 	} );
 }
 void HttpWithSession::filter_sDELETE( const std::string &mapping, std::function < void( Request &, Session & ) > f ){
-	Http::filter_DELETE( mapping, [&f, this]( Request & req ) {
+	Http::filter_DELETE( mapping, [f, this]( Request & req ) {
 		auto &session = getSession( req );
 		if (req.header["cookie"].size() > 0) {
 			if (req.header["cookie"].find("sessionId") == std::string::npos) {

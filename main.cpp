@@ -32,7 +32,7 @@ int main ( int argc, char **argv ) {
 	HttpWithSession srv( "localhost", 8090, true );
     bool loggedin = false;
     
-    srv.filter_GET("/", [&]( Request &req )->void {
+    srv.filter_sGET("/", [&]( Request &req, Session & )->void {
         req.queryString = "/index.html";
     });
 

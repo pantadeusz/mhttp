@@ -16,12 +16,9 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -DVER=${mhttp_VERSION_MAJOR}.${mhttp_VERSION_MINOR}")
 set(CMAKE_CXX_FLAGS_DEBUG "-ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-
-add_definitions(-Wall)
-add_definitions(-DVER="${mhttp_VERSION_MAJOR}.${mhttp_VERSION_MINOR}")
 
 FIND_PACKAGE( OpenMP)
   if(OPENMP_FOUND)

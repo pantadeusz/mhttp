@@ -40,11 +40,13 @@ using namespace tp::http;
 using namespace std::chrono_literals;
 
 TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
+//     errlog = [](const std::string &txt ){std::cout << txt << std::endl;};
+//     stdlog = [](const std::string &txt ){std::cout << txt << std::endl;};
     errlog = [](const std::string & ){};
     stdlog = [](const std::string & ){};
     static int port = 10990;
     port++;
-    HttpWithSession srv( "localhost", port, true );
+    HttpWithSession srv( "0.0.0.0", port, true );
     
     srv.filter_sGET( "/filtered", []( Request &req, Session ) {
         req.queryString = "/";        
@@ -56,7 +58,9 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
         return ResponseFactory::response("no session");
     } );
 
-    std::thread t([&](){srv.start();});
+    std::thread t([&](){
+       srv.start();
+    });
     t.detach();
     std::this_thread::sleep_for(1s);
     SECTION("setting up session cookie") {
@@ -65,13 +69,15 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
         req.proto = "HTTP/1.1";
         req.queryString = "/";
         req.remoteAddress = "localhost:" + std::to_string(port);
-        t_Response res1 = Http::doHttpQuery(req);
+        t_Response res1;
+        res1 = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res1;
+        
         std::string sessionID = ss.str();
         //for (auto h : res1.getHeader()) {
         //    std::cout << "h: " << h.first << " = " << h.second << std::endl;
-        //}
+        //}        
         REQUIRE(("sessionId="+sessionID)==res1.getHeader()["set-cookie"]);
     }
 
