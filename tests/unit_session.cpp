@@ -46,6 +46,9 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
     port++;
     HttpWithSession srv( "localhost", port, true );
     
+    srv.filter_sGET( "/filtered", []( Request &req, Session session ) {
+        req.queryString = "/";        
+    } );
     srv.sGET( "/", []( Request &req, Session session )->t_Response {
         return ResponseFactory::response(session.getId());
     } );
@@ -84,9 +87,6 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
         std::stringstream ss;
         ss << res1;
         std::string sessionID = ss.str();
-//        for (auto h : res1.getHeader()) {
-//            std::cout << "h: " << h.first << " = " << h.second << std::endl;
-//        }
         REQUIRE(("sessionId="+sessionID)==setCookieString);
         Request req2;
         req2.method = "GET";
@@ -98,10 +98,32 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
         std::stringstream ss2;
         ss2 << res2;
         std::string sessionID2 = ss2.str();
-//         for (auto h : res2.getHeader()) {
-//             std::cout << "h2: " << h.first << " = " << h.second << std::endl;
-//         }
-//         std::cout << "assertion" << std::endl;
+        REQUIRE(("sessionId="+sessionID2)==res2.getHeader()["set-cookie"]);
+        REQUIRE(sessionID2==sessionID);
+    }
+
+    SECTION("session persist between requests with filter") {
+        Request req;
+        req.method = "GET";
+        req.proto = "HTTP/1.1";
+        req.queryString = "/filtered";
+        req.remoteAddress = "localhost:" + std::to_string(port);
+        t_Response res1 = Http::doHttpQuery(req);
+        std::string setCookieString = res1.getHeader()["set-cookie"];
+        std::stringstream ss;
+        ss << res1;
+        std::string sessionID = ss.str();
+        REQUIRE(("sessionId="+sessionID)==setCookieString);
+        Request req2;
+        req2.method = "GET";
+        req2.proto = "HTTP/1.1";
+        req2.queryString = "/filtered";
+        req2.remoteAddress = "localhost:" + std::to_string(port);
+        req2.header["cookie"] = setCookieString;
+        t_Response res2 = Http::doHttpQuery(req2);
+        std::stringstream ss2;
+        ss2 << res2;
+        std::string sessionID2 = ss2.str();
         REQUIRE(("sessionId="+sessionID2)==res2.getHeader()["set-cookie"]);
         REQUIRE(sessionID2==sessionID);
     }
@@ -156,7 +178,6 @@ TEST_CASE( "http server with session handling errors and cleanups", "[mhttp][htt
             ss << res1;
             std::string sessionID = ss.str();
             REQUIRE_THAT( sessionID, Contains( "could not allocate another session" ) ); 
-            
         }
     }
     srv.stop();

@@ -90,6 +90,9 @@ void Http::filter_POST( const std::string &mapping, t_filterHandler f ) {
 	filterMappings["POST"].push_back( { std::regex( mapping ), f } );
 }
 
+void Http::filter_DELETE( const std::string &mapping, t_filterHandler f ) {
+	filterMappings["DELETE"].push_back( { std::regex( mapping ), f } );
+}
 
 std::string Http::readHttpRequestLine( SocketInterface & s ) {
 	char c[2] = {0, 0};
@@ -300,6 +303,7 @@ Http::Http( std::string hostname, int port, int async ) : listeningSocket( std::
 	urlMappings["DELETE"] = std::vector< std::pair < std::regex, t_requHandler > > ();
 	filterMappings["GET"] = std::vector< std::pair < std::regex, t_filterHandler > > ();
 	filterMappings["POST"] = std::vector< std::pair < std::regex, t_filterHandler > > ();
+	filterMappings["DELETE"] = std::vector< std::pair < std::regex, t_filterHandler > > ();
 	signal( SIGPIPE, SIG_IGN );
 	workers.reserve( 128 );
 	stdlog( "Web server at port: " + std::to_string( port ) );

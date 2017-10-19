@@ -49,6 +49,11 @@ public:
 
 	void sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
 	void sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
+	void sDELETE( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
+    
+    void filter_sGET( const std::string &mapping, std::function < void( Request &, Session & ) > f );
+    void filter_sPOST( const std::string &mapping, std::function < void( Request &, Session & ) > f );
+    void filter_sDELETE( const std::string &mapping, std::function < void( Request &, Session & ) > f );
 
 	HttpWithSession  ( std::string hostname = "localhost", int port = 8080, int async = false, i_SessionStorage *storage = NULL );
 };

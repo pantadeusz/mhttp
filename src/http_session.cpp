@@ -70,6 +70,55 @@ void HttpWithSession::sPOST( const std::string &mapping, std::function < t_Respo
 }
 
 
+void HttpWithSession::sDELETE( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
+	Http::DELETE( mapping, [&f, this]( Request & req ) -> t_Response {
+		auto &session = getSession( req );
+		auto res = f( req, session );
+		auto ret = saveSession( session, res );
+		return ret;
+	} );
+}
+
+
+void HttpWithSession::filter_sGET( const std::string &mapping, std::function < void( Request &, Session & ) > f ) {
+	Http::filter_GET( mapping, [&f, this]( Request & req ) {
+		auto &session = getSession( req );
+		if (req.header["cookie"].size() > 0) {
+			if (req.header["cookie"].find("sessionId") == std::string::npos) {
+				req.header["cookie"] = req.header["cookie"] + "; sessionId="+session.getId();
+			}
+		} else {
+			req.header["cookie"] = "sessionId="+session.getId();
+		}
+		f( req, session );
+	} );
+}
+void HttpWithSession::filter_sPOST( const std::string &mapping, std::function < void( Request &, Session & ) > f ){
+	Http::filter_POST( mapping, [&f, this]( Request & req ) {
+		auto &session = getSession( req );
+		if (req.header["cookie"].size() > 0) {
+			if (req.header["cookie"].find("sessionId") == std::string::npos) {
+				req.header["cookie"] = req.header["cookie"] + "; sessionId="+session.getId();
+			}
+		} else {
+			req.header["cookie"] = "sessionId="+session.getId();
+		}
+		f( req, session );
+	} );
+}
+void HttpWithSession::filter_sDELETE( const std::string &mapping, std::function < void( Request &, Session & ) > f ){
+	Http::filter_DELETE( mapping, [&f, this]( Request & req ) {
+		auto &session = getSession( req );
+		if (req.header["cookie"].size() > 0) {
+			if (req.header["cookie"].find("sessionId") == std::string::npos) {
+				req.header["cookie"] = req.header["cookie"] + "; sessionId="+session.getId();
+			}
+		} else {
+			req.header["cookie"] = "sessionId="+session.getId();
+		}
+		f( req, session );
+	} );
+}
 
 }
 }

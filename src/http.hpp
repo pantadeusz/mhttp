@@ -105,7 +105,8 @@ public:
 	 */
 	 void filter_GET( const std::string &mapping, t_filterHandler f );
 	 void filter_POST( const std::string &mapping, t_filterHandler f );
- 
+	 void filter_DELETE( const std::string &mapping, t_filterHandler f );
+	 
 
   /**
 	 * function that accepts new connection. It also parses the request and dispatches new task to handle it
