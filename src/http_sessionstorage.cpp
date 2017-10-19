@@ -1,4 +1,3 @@
-
 /*
 
     Copyright (C) 2017 Tadeusz Puźniakowski
@@ -22,39 +21,45 @@
 
 */
 
-#ifndef __PUZNIAKOWSKI_SESSION_HTTP__
-#define __PUZNIAKOWSKI_SESSION_HTTP__
+#include "http_sessionstorage.hpp"
 
-#include "http_memorysessionstorage.hpp"
 #include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 
-#include <chrono>
-#include <ctime>
-#include <unordered_map>
-#include <random>
-
+#include <iostream>
 
 namespace tp {
 namespace http {
 
-class HttpWithSession : public Http {
-private:
-public:
-	MemorySessionStorage sessionStorage;
 
-	Session &getSession( tp::http::Request &req );
-	tp::http::t_Response saveSession( Session &session, tp::http::t_Response &res );
+std::string StringSessionData::toString() {
+	return data;
+}
+void StringSessionData::fromString( const std::string  &str ) {
+	data = str;
+}
 
-	void sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
-	void sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
+i_SessionData *Session::getSessionData() {
+	return data.get();
+}
 
-	HttpWithSession  ( std::string hostname = "localhost", int port = 8080, int async = false );
-};
+void Session::setSessionData( i_SessionData *d ) {
+	data = std::shared_ptr < i_SessionData >( d );
+}
+std::string Session::getId() const {
+	return _id;
+}
+void Session::setId( const std::string &id ) {
+	_id = id;
+}
+double Session::getSecondsOfLife() {
+	return std::chrono::duration_cast<std::chrono::seconds>(
+			   std::chrono::system_clock::now() - createTime ).count();
+}
+Session::Session() {
+	createTime = std::chrono::system_clock::now();
+}
 
 }
 }
-
-
-#endif

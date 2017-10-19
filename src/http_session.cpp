@@ -1,4 +1,3 @@
-
 /*
 
     Copyright (C) 2017 Tadeusz Puźniakowski
@@ -34,85 +33,36 @@ namespace tp {
 namespace http {
 
 
-	std::string SessionStorage::generateSessionId() {
-		while ( true ) {
-			int m = uniform_dist( e1 );
-			if ( sessions.count(std::to_string( m )) < 1 ) {
-				return std::to_string( m );
-			}
-		}
-	}
-	
-	Session &SessionStorage::getSessionForRequest ( Request &req ) {
-		std::lock_guard<std::mutex> guard(session_mutex);
-		std::string sid = "";
-		std::string cookiestring = req.header["cookie"];
-		
-		//std::cout << "getSessionForRequest cookie: " << cookiestring << " ; " << std::endl;
 
-		std::regex pieces_regex( ".*sessionId=([0123456789]*)[^0123456789]*$" );
-		std::smatch pieces_match;
-		if ( std::regex_match ( cookiestring, pieces_match, pieces_regex ) ) {
-			for (size_t i = 0; i < pieces_match.size(); ++i) {
-				std::ssub_match sub_match = pieces_match[i];
-				auto fsid=sub_match.str();
-				if (sessions.count(fsid) > 0) sid = fsid;
-			} 	
-		}
-		//std::cout << "getSessionForRequest cookie - sid: " << sid << " ; " << std::endl;
-		
-	//    std::cout  << cookiestring << std::endl;
-		if ( sid == "" ) {
-			sid = generateSessionId();
-			sessions[sid].setId(sid);
-		}
-		return sessions[sid];
-	}
-	
-	
-	t_Response SessionStorage::storeSessionForRequest ( Session session, t_Response &res ) {
-		std::lock_guard<std::mutex> guard(session_mutex);
-		sessions[session.getId()] = session;
-		std::stringstream setcookie;
-		setcookie << "sessionId" << "=" << session.getId();
-		res.getHeader()["set-cookie"] = setcookie.str();
-		//std::cout << "set-cookie header: " << res.getHeader()["set-cookie"] << std::endl;
-		return res;
-	}
-	
-	
-	SessionStorage::SessionStorage() : e1( r() ), uniform_dist( 1000001, 1 << ( sizeof( int ) * 8 - 2 ) ) {
-	
-	}
-	
-		
+Session &HttpWithSession::getSession( tp::http::Request &req ) {
+	return sessionStorage.getSessionForRequest( req );
+}
+tp::http::t_Response HttpWithSession::saveSession( Session &session, tp::http::t_Response &res ) {
+	return sessionStorage.storeSessionForRequest( session, res );
+}
+HttpWithSession::HttpWithSession  ( std::string hostname, int port, int async )
+	: Http( hostname, port, async ) {
+
+}
 
 
 
+void HttpWithSession::sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
+	Http::GET( mapping, [&f, this]( Request & req ) -> t_Response {
+		auto &session = sessionStorage.getSessionForRequest( req );
+		auto res = f( req, session );
+		auto ret = sessionStorage.storeSessionForRequest( session, res );
+		return ret;
+	} );
+}
 
-
-
-
-
-
-
-
-	void HttpWithSession::sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
-		Http::GET(mapping, [&f,this]( Request & req) -> t_Response {
-			auto &session = sessionStorage.getSessionForRequest(req);
-			auto res = f(req, session);
-			auto ret = sessionStorage.storeSessionForRequest(session, res);
-			return ret;
-		});
-	}
-
-	void HttpWithSession::sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
-		Http::POST(mapping, [&f,this]( Request & req) -> t_Response {
-			auto &session = sessionStorage.getSessionForRequest(req);
-			auto res = f(req, session);
-			return sessionStorage.storeSessionForRequest(session, res);
-		});
-	}
+void HttpWithSession::sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
+	Http::POST( mapping, [&f, this]( Request & req ) -> t_Response {
+		auto &session = sessionStorage.getSessionForRequest( req );
+		auto res = f( req, session );
+		return sessionStorage.storeSessionForRequest( session, res );
+	} );
+}
 
 
 

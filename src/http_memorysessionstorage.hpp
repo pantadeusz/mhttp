@@ -22,10 +22,10 @@
 
 */
 
-#ifndef __PUZNIAKOWSKI_SESSION_HTTP__
-#define __PUZNIAKOWSKI_SESSION_HTTP__
+#ifndef __PUZNIAKOWSKI_MEMORYSESSIONSTORAGE_HTTP__
+#define __PUZNIAKOWSKI_MEMORYSESSIONSTORAGE_HTTP__
 
-#include "http_memorysessionstorage.hpp"
+#include "http_sessionstorage.hpp"
 #include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
@@ -39,18 +39,21 @@
 namespace tp {
 namespace http {
 
-class HttpWithSession : public Http {
-private:
+class MemorySessionStorage : public i_SessionStorage {
+protected:
+	std::mutex session_mutex;
+
+	std::unordered_map< std::string, Session > sessions;
+	std::random_device r;
+	std::default_random_engine e1;
+	std::uniform_int_distribution<int> uniform_dist;
+
+	std::string generateSessionId();
 public:
-	MemorySessionStorage sessionStorage;
 
-	Session &getSession( tp::http::Request &req );
-	tp::http::t_Response saveSession( Session &session, tp::http::t_Response &res );
-
-	void sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
-	void sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
-
-	HttpWithSession  ( std::string hostname = "localhost", int port = 8080, int async = false );
+	tp::http::t_Response storeSessionForRequest ( Session session, tp::http::t_Response &res );
+	Session &getSessionForRequest ( tp::http::Request &req );
+	MemorySessionStorage();
 };
 
 }
