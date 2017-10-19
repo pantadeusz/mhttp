@@ -35,8 +35,8 @@ using namespace fakeit;
 using namespace tp::http;
 
 TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
-    errlog = [](const std::string & e){};
-    stdlog = [](const std::string & e){};
+    errlog = [](const std::string & ){};
+    stdlog = [](const std::string & ){};
     static int port = 9990;
     port++;
 	Http srv( "localhost", port, true );

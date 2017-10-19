@@ -23,6 +23,11 @@ using namespace tp::http;
 using namespace std;
 
 int main ( int argc, char **argv ) {
+    if (argc > 1) {
+        if (std::string(argv[1]) == "-h") {
+            std::cout << "Example program for mhttp library." << std::endl;
+        }
+    }
     {
 	HttpWithSession srv( "localhost", 8090, true );
     bool loggedin = false;
@@ -35,12 +40,12 @@ int main ( int argc, char **argv ) {
         if (!loggedin) req.queryString = "/";
     });
 
-    srv.GET( "/login", [&loggedin]( Request &req )->t_Response {
+    srv.GET( "/login", [&loggedin]( Request & )->t_Response {
         loggedin = true;
         return ResponseFactory::response("Logged in :D");
     } );
 
-    srv.sGET( "/session", [&loggedin]( Request &req, Session &session )->t_Response {
+    srv.sGET( "/session", [&loggedin]( Request &, Session &session )->t_Response {
         if (session.getSessionData() == NULL) {
             session.setSessionData(new StringSessionData());
         }

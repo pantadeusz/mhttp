@@ -67,7 +67,7 @@ namespace http {
     class ListeningSocket : public ConnectedSocket {
     
     public:
-        ListeningSocket(std::string port);
+        ListeningSocket(std::string host, std::string port);
     
         ConnectedSocket accept();
     };

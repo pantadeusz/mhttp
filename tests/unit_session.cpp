@@ -40,19 +40,19 @@ using namespace tp::http;
 using namespace std::chrono_literals;
 
 TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
-    errlog = [](const std::string & e){};
-    stdlog = [](const std::string & e){};
+    errlog = [](const std::string & ){};
+    stdlog = [](const std::string & ){};
     static int port = 10990;
     port++;
     HttpWithSession srv( "localhost", port, true );
     
-    srv.filter_sGET( "/filtered", []( Request &req, Session session ) {
+    srv.filter_sGET( "/filtered", []( Request &req, Session ) {
         req.queryString = "/";        
     } );
-    srv.sGET( "/", []( Request &req, Session session )->t_Response {
+    srv.sGET( "/", []( Request &, Session session )->t_Response {
         return ResponseFactory::response(session.getId());
     } );
-    srv.GET( "/nosess", []( Request &req )->t_Response {
+    srv.GET( "/nosess", []( Request & )->t_Response {
         return ResponseFactory::response("no session");
     } );
 
@@ -133,16 +133,16 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
 
 
 TEST_CASE( "http server with session handling errors and cleanups", "[mhttp][http][session]" ) {
-    errlog = [](const std::string & e){};
-    stdlog = [](const std::string & e){};
+    errlog = [](const std::string & ){};
+    stdlog = [](const std::string & ){};
     static int port = 11990;
     port++;
     HttpWithSession srv( "localhost", port, true, new MemorySessionStorage(3, 5, 5));
     
-    srv.sGET( "/", []( Request &req, Session session )->t_Response {
+    srv.sGET( "/", []( Request &, Session session )->t_Response {
         return ResponseFactory::response(session.getId());
     } );
-    srv.GET( "/nosess", []( Request &req )->t_Response {
+    srv.GET( "/nosess", []( Request & )->t_Response {
         return ResponseFactory::response("no session");
     } );
 

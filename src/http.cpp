@@ -66,7 +66,7 @@ std::function<void( const std::string & )> stdlog = []( const std::string &s ) {
 
 
 
-void Http::sigchld_handler( int s ) {
+void Http::sigchld_handler( int ) {
 	while( waitpid( -1, NULL, WNOHANG ) > 0 );
 }
 
@@ -295,7 +295,7 @@ int Http::acceptConnection() {
 	return 0;
 }
 
-Http::Http( std::string hostname, int port, int async ) : listeningSocket( std::to_string( port ) ) {
+Http::Http( std::string hostname, int port, int async ) : listeningSocket( hostname, std::to_string( port ) ) {
 	this->async = async;
 	this->port = port;
 	urlMappings["GET"] = std::vector< std::pair < std::regex, t_requHandler > > ();
@@ -306,7 +306,7 @@ Http::Http( std::string hostname, int port, int async ) : listeningSocket( std::
 	filterMappings["DELETE"] = std::vector< std::pair < std::regex, t_filterHandler > > ();
 	signal( SIGPIPE, SIG_IGN );
 	workers.reserve( 128 );
-	stdlog( "Web server at port: " + std::to_string( port ) );
+	stdlog( "Web server at " + hostname + " : " + std::to_string( port ) );
 
 }
 Http::~Http () {
@@ -343,7 +343,7 @@ t_requHandler getStaticFileHandler( const std::string sprefix, const bool safe_p
 
 
 
-t_requHandler Http::notFoundHandler = []( Request &req )->t_Response {
+t_requHandler Http::notFoundHandler = []( Request & )->t_Response {
 	return ResponseFactory::response( "Page not found", 404,  "not found" );
 };
 

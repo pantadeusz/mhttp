@@ -67,7 +67,7 @@ int ConnectedSocket::shutdonwOut() {
     return ::shutdown (sfd, SHUT_WR);
 }
 
-ListeningSocket::ListeningSocket(std::string port) {
+ListeningSocket::ListeningSocket(std::string host, std::string port) {
     int yes = 1;
     struct addrinfo hints;
     struct addrinfo *result, *rp;
@@ -82,7 +82,7 @@ ListeningSocket::ListeningSocket(std::string port) {
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
 
-    s = getaddrinfo(NULL, port.c_str(), &hints, &result);
+    s = getaddrinfo(host.c_str(), port.c_str(), &hints, &result);
     if (s != 0) {
         std::stringstream ss;
         ss << "ListeningSocket getaddrinfo:: " << gai_strerror(s) << "; port= " << port;
