@@ -22,6 +22,8 @@
 */
 
 #include <http_session.hpp>
+#include <http_memorysessionstorage.hpp>
+
 #include <catch.hpp>
 #include <fakeit.hpp>
 
@@ -32,6 +34,7 @@
 #include <chrono>
 #include <thread>
 
+using namespace Catch;
 using namespace fakeit;
 using namespace tp::http;
 using namespace std::chrono_literals;
@@ -103,5 +106,58 @@ TEST_CASE( "http server with session support", "[mhttp][http][session]" ) {
         REQUIRE(sessionID2==sessionID);
     }
     srv.stop();
+}
 
+
+
+TEST_CASE( "http server with session handling errors and cleanups", "[mhttp][http][session]" ) {
+    errlog = [](const std::string & e){};
+    stdlog = [](const std::string & e){};
+    static int port = 11990;
+    port++;
+    HttpWithSession srv( "localhost", port, true, new MemorySessionStorage(3, 5, 5));
+    
+    srv.sGET( "/", []( Request &req, Session session )->t_Response {
+        return ResponseFactory::response(session.getId());
+    } );
+    srv.GET( "/nosess", []( Request &req )->t_Response {
+        return ResponseFactory::response("no session");
+    } );
+
+    std::thread t([&](){srv.start();});
+    t.detach();
+    std::this_thread::sleep_for(1s);
+
+    SECTION("too many sessions test") {
+        for (int i = 0; i < 10; i++) {
+            Request req;
+            req.method = "GET";
+            req.proto = "HTTP/1.1";
+            req.queryString = "/";
+            req.remoteAddress = "localhost:" + std::to_string(port);
+            t_Response res1 = Http::doHttpQuery(req);
+            std::string setCookieString = res1.getHeader()["set-cookie"];
+            std::stringstream ss;
+            ss << res1;
+            std::string sessionID = ss.str();
+            if (i == 0) {
+                REQUIRE(("sessionId="+sessionID)==res1.getHeader()["set-cookie"]);
+            }
+        }
+        for (int i = 0; i < 10; i++) {
+            Request req;
+            req.method = "GET";
+            req.proto = "HTTP/1.1";
+            req.queryString = "/";
+            req.remoteAddress = "localhost:" + std::to_string(port);
+            t_Response res1 = Http::doHttpQuery(req);
+            std::string setCookieString = res1.getHeader()["set-cookie"];
+            std::stringstream ss;
+            ss << res1;
+            std::string sessionID = ss.str();
+            REQUIRE_THAT( sessionID, Contains( "could not allocate another session" ) ); 
+            
+        }
+    }
+    srv.stop();
 }

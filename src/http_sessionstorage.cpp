@@ -23,7 +23,6 @@
 
 #include "http_sessionstorage.hpp"
 
-#include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 

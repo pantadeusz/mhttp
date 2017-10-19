@@ -21,11 +21,12 @@
 
 */
 
+#include "http_memorysessionstorage.hpp"
 #include "http_session.hpp"
-
 #include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+
 
 #include <iostream>
 
@@ -35,33 +36,37 @@ namespace http {
 
 
 Session &HttpWithSession::getSession( tp::http::Request &req ) {
-	return sessionStorage.getSessionForRequest( req );
+	return sessionStorage.get()->getSessionForRequest( req );
 }
 tp::http::t_Response HttpWithSession::saveSession( Session &session, tp::http::t_Response &res ) {
-	return sessionStorage.storeSessionForRequest( session, res );
+	return sessionStorage.get()->storeSessionForRequest( session, res );
 }
-HttpWithSession::HttpWithSession  ( std::string hostname, int port, int async )
+HttpWithSession::HttpWithSession  ( std::string hostname, int port, int async, i_SessionStorage *storage)
 	: Http( hostname, port, async ) {
-
+		if (storage == NULL) {
+			storage = new MemorySessionStorage();
+		}
+	sessionStorage = std::unique_ptr<i_SessionStorage>(storage);
 }
 
 
 
 void HttpWithSession::sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
 	Http::GET( mapping, [&f, this]( Request & req ) -> t_Response {
-		auto &session = sessionStorage.getSessionForRequest( req );
+		auto &session = getSession( req );
 		auto res = f( req, session );
-		auto ret = sessionStorage.storeSessionForRequest( session, res );
+		auto ret = saveSession( session, res );
 		return ret;
 	} );
 }
 
 void HttpWithSession::sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f ) {
 	Http::POST( mapping, [&f, this]( Request & req ) -> t_Response {
-		auto &session = sessionStorage.getSessionForRequest( req );
+		auto &session = getSession( req );
 		auto res = f( req, session );
-		return sessionStorage.storeSessionForRequest( session, res );
-	} );
+		auto ret = saveSession( session, res );
+		return ret;
+		} );
 }
 
 

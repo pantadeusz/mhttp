@@ -22,12 +22,13 @@
 */
 
 #include "http_session.hpp"
+#include "http_memorysessionstorage.hpp"
 
-#include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 
 #include <iostream>
+#include <list>
 
 namespace tp {
 namespace http {
@@ -35,7 +36,7 @@ namespace http {
 
 std::string MemorySessionStorage::generateSessionId() {
 	while ( true ) {
-		int m = uniform_dist( e1 );
+		int m = uniform_dist( e1 ) & 0x07fffffff;
 		if ( sessions.count( std::to_string( m ) ) < 1 ) {
 			return std::to_string( m );
 		}
@@ -63,6 +64,20 @@ Session &MemorySessionStorage::getSessionForRequest ( Request &req ) {
 	//    std::cout  << cookiestring << std::endl;
 	if ( sid == "" ) {
 		sid = generateSessionId();
+		if ((sessions.size() % sessionCleanupCycle) == 0) {
+			std::list < std::string > sessionToDelete;
+			for (auto &s : sessions) {
+				if (s.second.getSecondsOfLife() > sessionTimeout) {
+					sessionToDelete.push_back(s.first);
+				}	
+			}
+			for (auto &sidd : sessionToDelete) {
+				sessions.erase(sidd);
+			}
+		}
+		if ((maxSessions == -1) || ((int)sessions.size() > maxSessions)) {
+			throw std::overflow_error("could not allocate another session"); 
+		}
 		sessions[sid].setId( sid );
 	}
 	return sessions[sid];
@@ -80,8 +95,12 @@ t_Response MemorySessionStorage::storeSessionForRequest ( Session session, t_Res
 }
 
 
-MemorySessionStorage::MemorySessionStorage() : e1( r() ), uniform_dist( 1000001, 1 << ( sizeof( int ) * 8 - 2 ) ) {
-
+MemorySessionStorage::MemorySessionStorage(int sessionLifeTimeSeconds,int maxSessions_, int sessionCleanupCycle_)
+		 : e1( r() ), 
+		 uniform_dist( 1001, 1 << ( sizeof( int ) * 8 - 2 ) ),
+		 sessionTimeout(sessionLifeTimeSeconds),
+		 maxSessions(maxSessions_),
+		 sessionCleanupCycle(sessionCleanupCycle_) {
 }
 
 

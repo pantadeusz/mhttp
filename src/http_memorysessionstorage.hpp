@@ -26,13 +26,14 @@
 #define __PUZNIAKOWSKI_MEMORYSESSIONSTORAGE_HTTP__
 
 #include "http_sessionstorage.hpp"
-#include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 
 #include <chrono>
 #include <ctime>
 #include <unordered_map>
+#include <random>
+#include <mutex>
 #include <random>
 
 
@@ -48,12 +49,16 @@ protected:
 	std::default_random_engine e1;
 	std::uniform_int_distribution<int> uniform_dist;
 
-	std::string generateSessionId();
+	int sessionTimeout;
+	int maxSessions;
+	int sessionCleanupCycle;
+
 public:
 
+	std::string generateSessionId();
 	tp::http::t_Response storeSessionForRequest ( Session session, tp::http::t_Response &res );
 	Session &getSessionForRequest ( tp::http::Request &req );
-	MemorySessionStorage();
+	MemorySessionStorage(int sessionLifeTimeSeconds = 3600, int maxSessions = 10000, int sessionCleanupCycle = 1000);
 };
 
 }

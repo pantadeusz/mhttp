@@ -25,7 +25,7 @@
 #ifndef __PUZNIAKOWSKI_SESSION_HTTP__
 #define __PUZNIAKOWSKI_SESSION_HTTP__
 
-#include "http_memorysessionstorage.hpp"
+#include "http_sessionstorage.hpp"
 #include "http.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
@@ -42,7 +42,7 @@ namespace http {
 class HttpWithSession : public Http {
 private:
 public:
-	MemorySessionStorage sessionStorage;
+	std::unique_ptr < i_SessionStorage > sessionStorage;
 
 	Session &getSession( tp::http::Request &req );
 	tp::http::t_Response saveSession( Session &session, tp::http::t_Response &res );
@@ -50,7 +50,7 @@ public:
 	void sGET( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
 	void sPOST( const std::string &mapping, std::function < t_Response ( Request &, Session & ) > f );
 
-	HttpWithSession  ( std::string hostname = "localhost", int port = 8080, int async = false );
+	HttpWithSession  ( std::string hostname = "localhost", int port = 8080, int async = false, i_SessionStorage *storage = NULL );
 };
 
 }

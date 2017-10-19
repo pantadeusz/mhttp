@@ -25,14 +25,14 @@
 #ifndef __PUZNIAKOWSKI_SESSIONSTORAGE_HTTP__
 #define __PUZNIAKOWSKI_SESSIONSTORAGE_HTTP__
 
-#include "http.hpp"
+#include "http_sessionstorage.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 
 #include <chrono>
 #include <ctime>
 #include <unordered_map>
-#include <random>
+
 
 
 namespace tp {
@@ -78,6 +78,7 @@ public:
 
 class i_SessionStorage {
 public:
+	virtual std::string generateSessionId() = 0;
 	virtual Session &getSessionForRequest ( tp::http::Request &req ) = 0;
 	virtual tp::http::t_Response storeSessionForRequest ( Session session, tp::http::t_Response &res ) = 0;
 };
