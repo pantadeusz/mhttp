@@ -13,5 +13,5 @@ install:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
 
 script:
- - ./configure && make check
+ - ./configure && cd buildmake && make check
 

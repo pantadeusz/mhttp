@@ -3,4 +3,12 @@
 # export CC=/usr/bin/clang
 # export CXX=/usr/bin/clang++
 
-cmake -DCMAKE_INSTALL_PREFIX:PATH=./build/mhttp
+#cmake -DCMAKE_INSTALL_PREFIX:PATH=./build/mhttp
+
+
+mkdir -p buildmake
+cd buildmake
+cmake –G"Unix Makefiles" ../
+cp -R ../tests ./
+# cp ../*.json* ./
+cd ..
