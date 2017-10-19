@@ -25,7 +25,6 @@
 #ifndef __PUZNIAKOWSKI_SESSIONSTORAGE_HTTP__
 #define __PUZNIAKOWSKI_SESSIONSTORAGE_HTTP__
 
-#include "http_sessionstorage.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
 
