@@ -48,7 +48,7 @@ Session &MemorySessionStorage::getSessionForRequest ( Request &req ) {
 	std::string sid = "";
 	std::string cookiestring = req.header["cookie"];
 
-	//std::cout << "getSessionForRequest cookie: " << cookiestring << " ; " << std::endl;
+	std::cout << "getSessionForRequest cookie: " << cookiestring << " ; " << std::endl;
 
 	std::regex pieces_regex( "sessionId=([0123456789][0123456789]*)" );
 	std::smatch pieces_match;
@@ -62,7 +62,7 @@ Session &MemorySessionStorage::getSessionForRequest ( Request &req ) {
 			}
 		}
 	}
-	//std::cout << "getSessionForRequest cookie - sid: " << sid << " ; " << std::endl;
+	std::cout << "getSessionForRequest cookie - sid: " << sid << " ; " << std::endl;
 
 	//    std::cout  << cookiestring << std::endl;
 	if ( sid == "" ) {
