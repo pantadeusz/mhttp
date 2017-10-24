@@ -84,9 +84,14 @@ Session &MemorySessionStorage::getSessionForRequest ( Request &req ) {
 }
 
 
-t_Response MemorySessionStorage::storeSessionForRequest ( Session session, t_Response &res ) {
+void MemorySessionStorage::storeSession ( Session session ) {
 	std::lock_guard<std::mutex> guard( session_mutex );
 	sessions[session.getId()] = session;
+}
+
+
+t_Response MemorySessionStorage::storeSessionForRequest ( Session session, t_Response &res ) {
+	storeSession ( session );
 	std::stringstream setcookie;
 	setcookie << "sessionId" << "=" << session.getId();
 	res.getHeader()["set-cookie"] = setcookie.str();

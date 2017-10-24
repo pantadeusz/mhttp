@@ -86,6 +86,7 @@ public:
 	virtual std::string generateSessionId() = 0;
 	virtual Session &getSessionForRequest ( tp::http::Request &req ) = 0;
 	virtual tp::http::t_Response storeSessionForRequest ( Session session, tp::http::t_Response &res ) = 0;
+	virtual void storeSession ( Session session ) = 0;
 };
 
 

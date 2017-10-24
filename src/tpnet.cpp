@@ -43,7 +43,7 @@ ConnectedSocket::ConnectedSocket() : refcounter(new int), sfd(-1){
 
 ConnectedSocket::~ConnectedSocket() {
     if (refcounter.use_count() == 1) {
-        shutdonwOut();
+        shutdownOut();
         char c;
         for (int ttl = 20; ttl > 0 && (recv(sfd, &c, 1, MSG_PEEK)>0); ttl--) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -63,7 +63,7 @@ int ConnectedSocket::read(void * buf, size_t bufsize) {
 int ConnectedSocket::close() {
     return ::close (sfd);
 }
-int ConnectedSocket::shutdonwOut() {
+int ConnectedSocket::shutdownOut() {
     return ::shutdown (sfd, SHUT_WR);
 }
 

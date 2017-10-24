@@ -241,7 +241,7 @@ int Http::sendResponse( SocketInterface & clientsocket, t_Response resp ) {
 			}
 		} while ( bread.size() > 0 );
 	}
-	clientsocket.shutdonwOut();
+	clientsocket.shutdownOut();
 	return 1;
 }
 
@@ -377,7 +377,7 @@ t_Response Http::doHttpQuery( Request req ) {
 		std::string s = ss.str();
 		srv.write( s.data(), s.size() ); // send request
 	}
-	srv.shutdonwOut();
+	srv.shutdownOut();
 	std::string response = Http::readHttpRequestLine( srv );
 	std::map<std::string, std::string> header = Http::readHttpHeader( srv );
 	std::vector <char> data;

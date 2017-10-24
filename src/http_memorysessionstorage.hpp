@@ -57,6 +57,7 @@ public:
 
 	std::string generateSessionId();
 	tp::http::t_Response storeSessionForRequest ( Session session, tp::http::t_Response &res );
+	void storeSession ( Session session );
 	Session &getSessionForRequest ( tp::http::Request &req );
 	MemorySessionStorage(int sessionLifeTimeSeconds = 3600, int maxSessions = 10000, int sessionCleanupCycle = 1000);
 };

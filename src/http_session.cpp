@@ -91,6 +91,7 @@ void HttpWithSession::filter_sGET( const std::string &mapping, std::function < v
 			req.header["cookie"] = "sessionId="+session.getId();
 		}
 		f( req, session );
+		sessionStorage.get()->storeSession( session );
 	} );
 }
 void HttpWithSession::filter_sPOST( const std::string &mapping, std::function < void( Request &, Session & ) > f ){
@@ -104,6 +105,7 @@ void HttpWithSession::filter_sPOST( const std::string &mapping, std::function < 
 			req.header["cookie"] = "sessionId="+session.getId();
 		}
 		f( req, session );
+		sessionStorage.get()->storeSession( session );
 	} );
 }
 void HttpWithSession::filter_sDELETE( const std::string &mapping, std::function < void( Request &, Session & ) > f ){
@@ -117,6 +119,7 @@ void HttpWithSession::filter_sDELETE( const std::string &mapping, std::function 
 			req.header["cookie"] = "sessionId="+session.getId();
 		}
 		f( req, session );
+		sessionStorage.get()->storeSession( session );
 	} );
 }
 
