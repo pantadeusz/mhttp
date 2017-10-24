@@ -66,8 +66,8 @@ Session &MemorySessionStorage::getSessionForRequest ( Request &req ) {
 	std::cout << "getSessionForRequest cookie - sid: " << sid << " ; " << std::endl;
 
 	//    std::cout  << cookiestring << std::endl;
-	if ( sid == "" ) {
-		sid = generateSessionId();
+	if (( sid == "" ) || (sessions.count( sid ) == 0)) {
+		if (sid == "") sid = generateSessionId();
 		if ((sessions.size() % sessionCleanupCycle) == 0) {
 			std::list < std::string > sessionToDelete;
 			for (auto &s : sessions) {
