@@ -53,7 +53,7 @@ int main ( int argc, char **argv ) {
         sd->fromString(sd->toString() + "x "); // append x to session data string
         return ResponseFactory::response("Session ID = " + sd->toString());
     } );
-    
+
     srv.GET( "/hello", []( Request &req )->t_Response {
         std::stringstream ss;
         ss << "<p>Hello world!!</p><table>";

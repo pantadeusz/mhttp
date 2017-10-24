@@ -10,5 +10,11 @@ mkdir -p buildmake
 cd buildmake
 cmake –G"Unix Makefiles" ../
 cp -R ../tests ./
-# cp ../*.json* ./
+cd ..
+
+
+mkdir -p buildninja/tests buildninja/build
+cd buildninja
+cmake -GNinja ../ 
+cp -R ../tests ./
 cd ..
