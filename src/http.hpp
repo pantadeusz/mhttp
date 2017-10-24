@@ -37,11 +37,10 @@
 #include <future>
 #include <utility>
 #include <regex>
-#include <signal.h>
 
 namespace tp {
-	namespace http {
-	
+namespace http {
+
 
 
 typedef std::function < t_Response ( Request & )> t_requHandler;
@@ -55,7 +54,6 @@ private:
 	// method
 	std::map < std::string, std::vector < std::pair < std::regex, t_requHandler > > > urlMappings;
 	std::map < std::string, std::vector < std::pair < std::regex, t_filterHandler > > > filterMappings;
-	
 
 	/// tasks
 	std::mutex workers_mutex;
@@ -64,57 +62,103 @@ private:
 	// accepting socket
 	ListeningSocket listeningSocket;
 
-
 	// current port
 	int port;
 	// is async
 	int async;
 
-	struct sigaction sa;
-
-	static void sigchld_handler( int s );
-
-
 	std::future < int > acceptingWorker;
 
-		
+	bool terminateServerLoop; ///< does the main server loop should be terminated?
+	
 
-	static Request getRequest(SocketInterface & clientsocket);
-	Request applyRequestFilters(const Request req_);
-	t_Response processRequests(const Request req) ;
-	static int sendResponse(SocketInterface & clientsocket, t_Response response);
-		
+	static Request getRequest( SocketInterface & clientsocket );
+	Request applyRequestFilters( const Request req_ );
+	t_Response processRequests( const Request req ) ;
+	static int sendResponse( SocketInterface & clientsocket, t_Response response );
+
 
 public:
 
-	static std::string readHttpRequestLine(SocketInterface & s);
-	static std::map<std::string,std::string> readHttpHeader(SocketInterface & sock);
-	static std::vector <char> readHttpData(SocketInterface & clientsocket, size_t dataSize);
-	
-	
+	/**
+	 * @brief Reads first line of HTTP request
+	 * 
+	 * @param s connected socket
+	 * @return  std::string first line of http transmission
+	 ************/
+	static std::string readHttpRequestLine( SocketInterface & s );
 
 	/**
-	 * adds new handler for url.
-	 */
+	 * @brief Read HTTP header lines and form map of the Key - Value pairs of header lines
+	 * 
+	 * @param sock connected socket
+	 * @return std::map<std::string, std::string> 
+	 ************/
+	static std::map<std::string, std::string> readHttpHeader( SocketInterface & sock );
+
+	/**
+	 * @brief Read HTTP data - especially for POST requests
+	 * 
+	 * @param clientsocket conneced socket
+	 * @param dataSize the size of data determined by content-size
+	 * @return std::vector <char> returned data
+	 ************/
+	static std::vector <char> readHttpData( SocketInterface & clientsocket, size_t dataSize );
+
+
+
+	/**
+	 * @brief adds handler for GET requests. It will check mappings in order
+	 * 
+	 * @param mapping the URL pattern (regex) for request
+	 * @param f request handler for mapping
+	 ************/
 	virtual void GET( const std::string &mapping, t_requHandler f );
-	virtual void POST( const std::string &mapping, t_requHandler f );
-	virtual void DELETE( const std::string &mapping, t_requHandler f );
-	
 	/**
-	 * adds new handler for url.
-	 */
-	 void filter_GET( const std::string &mapping, t_filterHandler f );
-	 void filter_POST( const std::string &mapping, t_filterHandler f );
-	 void filter_DELETE( const std::string &mapping, t_filterHandler f );
-	 
+	 * @brief adds handler for POST requests. It will check mappings in order
+	 * 
+	 * @param mapping the URL pattern (regex) for request
+	 * @param f request handler for mapping
+	 ************/
+	virtual void POST( const std::string &mapping, t_requHandler f );
+		/**
+	 * @brief adds handler for DELETE requests. It will check mappings in order
+	 * 
+	 * @param mapping the URL pattern (regex) for request
+	 * @param f request handler for mapping
+	 ************/
+	virtual void DELETE( const std::string &mapping, t_requHandler f );
 
-  /**
+	/**
+	 * @brief adds filter for mapping. Filter will transform Request. It chan change path and other elements of the request
+	 * 
+	 * @param mapping the regex for matchin URL
+	 * @param f handler - the function that will transform requests
+	 ************/
+	void filter_GET( const std::string &mapping, t_filterHandler f );
+	/**
+	 * @brief adds filter for mapping. Filter will transform Request. It chan change path and other elements of the request
+	 * 
+	 * @param mapping the regex for matchin URL
+	 * @param f handler - the function that will transform requests
+	 ************/
+	void filter_POST( const std::string &mapping, t_filterHandler f );
+	/**
+	 * @brief adds filter for mapping. Filter will transform Request. It chan change path and other elements of the request
+	 * 
+	 * @param mapping the regex for matchin URL
+	 * @param f handler - the function that will transform requests
+	 ************/
+	void filter_DELETE( const std::string &mapping, t_filterHandler f );
+
+
+	/**
 	 * function that accepts new connection. It also parses the request and dispatches new task to handle it
 	 */
 	int acceptConnection();
 
- /**
-  * constructor creates working server
+	/**
+	 * constructor creates working server
 	*/
 	Http( std::string hostname = "localhost", int port = 8080, int async = false );
 	virtual ~Http ();
@@ -124,14 +168,13 @@ public:
 	 * */
 	static t_requHandler notFoundHandler;
 
-	bool terminateServerLoop;
 	void start();
-	void stop() {terminateServerLoop = true;
+	void stop() {
+		terminateServerLoop = true;
 	};
-	
 
 	// performs get operation
-	static t_Response doHttpQuery(Request req);
+	static t_Response doHttpQuery( Request req );
 } Http;
 
 
@@ -146,10 +189,16 @@ t_requHandler getStaticFileHandler( const std::string sprefix = "", const bool s
 
 
 
+/**
+ * @brief the function that will accept error logs
+ ************/
 extern std::function<void( const std::string & )> errlog;
+/**
+ * @brief the function that will accept logs
+ ************/
 extern std::function<void( const std::string & )> stdlog;
 
-	
+
 
 }
 }

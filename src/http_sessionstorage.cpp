@@ -53,7 +53,7 @@ void Session::setId( const std::string &id ) {
 	_id = id;
 }
 double Session::getSecondsOfLife() {
-	return std::chrono::duration_cast<std::chrono::seconds>(
+	return (double)std::chrono::duration_cast<std::chrono::seconds>(
 			   std::chrono::system_clock::now() - createTime ).count();
 }
 Session::Session() {

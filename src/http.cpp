@@ -27,26 +27,20 @@
 
 
 #include <algorithm>
-#include <arpa/inet.h>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <map>
-#include <netdb.h>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <string>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
 #include <utility>
 #include <vector>
+
+#include <signal.h>
+
+//#include <sys/wait.h>
 
 using namespace std;
 
@@ -66,9 +60,9 @@ std::function<void( const std::string & )> stdlog = []( const std::string &s ) {
 
 
 
-void Http::sigchld_handler( int ) {
-	while( waitpid( -1, NULL, WNOHANG ) > 0 );
-}
+// void Http::sigchld_handler( int ) {
+// 	while( waitpid( -1, NULL, WNOHANG ) > 0 );
+// }
 
 void Http::GET( const std::string &mapping, t_requHandler f ) {
 	urlMappings["GET"].push_back( { std::regex( mapping ), f } );

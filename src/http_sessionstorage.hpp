@@ -68,6 +68,12 @@ protected:
 public:
 	std::shared_ptr < i_SessionData > data;
 	virtual i_SessionData *getSessionData();
+	/**
+	 * @brief 
+	 * 
+	 * @param d 
+	 * @return  void 
+	 **/
 	virtual void setSessionData( i_SessionData *d );
 	virtual std::string getId() const;
 	virtual void setId( const std::string &id );

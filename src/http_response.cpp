@@ -169,10 +169,6 @@ std::map < std::string, std::string > ResponseFileStream::getHeader() const{
 ////////////////////////////////////////////////////////////////////////
 
 
-
-
-
-
 t_Response ResponseFactory::response(const std::string &responseString, const int code, const std::string &comment) {
     ResponseStringStream &res = *(new ResponseStringStream());
     res.ss << responseString;
