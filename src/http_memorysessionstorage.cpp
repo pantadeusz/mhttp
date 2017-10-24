@@ -50,13 +50,16 @@ Session &MemorySessionStorage::getSessionForRequest ( Request &req ) {
 
 	//std::cout << "getSessionForRequest cookie: " << cookiestring << " ; " << std::endl;
 
-	std::regex pieces_regex( ".*sessionId=([0123456789]*)[^0123456789]*$" );
+	std::regex pieces_regex( "sessionId=([0123456789][0123456789]*)" );
 	std::smatch pieces_match;
 	if ( std::regex_match ( cookiestring, pieces_match, pieces_regex ) ) {
 		for ( size_t i = 0; i < pieces_match.size(); ++i ) {
 			std::ssub_match sub_match = pieces_match[i];
 			auto fsid = sub_match.str();
-			if ( sessions.count( fsid ) > 0 ) sid = fsid;
+			if ( sessions.count( fsid ) > 0 ) {
+				sid = fsid;
+				break;
+			}
 		}
 	}
 	//std::cout << "getSessionForRequest cookie - sid: " << sid << " ; " << std::endl;
