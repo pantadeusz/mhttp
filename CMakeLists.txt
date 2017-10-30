@@ -55,8 +55,9 @@ target_link_libraries(mhttp_tests mhttp)
 enable_testing()
 
 add_test( mhttp_tests mhttp_tests WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
-                  DEPENDS mhttp_tests)
+add_custom_target(check 
+      COMMAND ${CMAKE_CTEST_COMMAND}
+      DEPENDS mhttp_tests)
 
 SET(CPACK_PACKAGE_VERSION_MAJOR ${mhttp_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${mhttp_VERSION_MINOR})

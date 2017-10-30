@@ -9,14 +9,14 @@ before_install:
 
 install: 
   # C++14
-  - sudo apt-get install -qq g++-6
+  - sudo apt-get install -qq g++-6 ninja-build cmake
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
 
 script:
- - ./configure && cd buildmake && make check
+ - ./configure && cd buildmake && make check && cd .. && ./buildmake/mhttp_tests > tests.log
 
 after_success:
- - cat  buildmake/Testing/Temporary/LastTest.log | grep assertions
+ - cat  tests.log | grep assertions
 
 after_failure:
- - cat  buildmake/Testing/Temporary/LastTest.log
+ - cat  tests.log
