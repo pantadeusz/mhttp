@@ -16,7 +16,7 @@ script:
  - ./configure && cd buildmake && make check
 
 after_success:
- - cat Testing/Temporary/LastTest.log | grep assertions
+ - cat  buildmake/Testing/Temporary/LastTest.log | grep assertions
 
 after_failure:
- - cat Testing/Temporary/LastTest.log
+ - cat  buildmake/Testing/Temporary/LastTest.log
