@@ -107,11 +107,10 @@ public:
 std::ostream& operator << ( std::ostream& os, t_Response & value_ );
 
 
-class ResponseFactory {
-public:
-    static t_Response response( const std::string &responseString, const int code = 200, const std::string &comment = "OK");
-    static t_Response responseFile( const std::string &fname, const int code = 200, const std::string &comment = "OK");
-    static t_Response response( const std::vector < char > &responseString, const int code = 200, const std::string &comment = "OK");
+namespace ResponseFactory {
+    t_Response response( const std::string &responseString, const int code = 200, const std::string &comment = "OK");
+    t_Response responseFile( const std::string &fname, const int code = 200, const std::string &comment = "OK");
+    t_Response response( const std::vector < char > &responseString, const int code = 200, const std::string &comment = "OK");
 };
 
 

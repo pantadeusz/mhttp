@@ -168,8 +168,9 @@ std::map < std::string, std::string > ResponseFileStream::getHeader() const{
 
 ////////////////////////////////////////////////////////////////////////
 
+namespace ResponseFactory {
 
-t_Response ResponseFactory::response(const std::string &responseString, const int code, const std::string &comment) {
+t_Response response(const std::string &responseString, const int code, const std::string &comment) {
     ResponseStringStream &res = *(new ResponseStringStream());
     res.ss << responseString;
     res.getCodeComment() = comment;
@@ -177,7 +178,7 @@ t_Response ResponseFactory::response(const std::string &responseString, const in
     return t_Response(&res);
 }
 
-t_Response ResponseFactory::response(const std::vector < char > &responseString, const int code, const std::string &comment) {
+t_Response response(const std::vector < char > &responseString, const int code, const std::string &comment) {
     ResponseStringStream &res = *(new ResponseStringStream());
     for (char c : responseString) res.ss << c;
     res.getCodeComment() = comment;
@@ -185,16 +186,14 @@ t_Response ResponseFactory::response(const std::vector < char > &responseString,
     return t_Response(&res);
 }
 
-
-
-
-t_Response ResponseFactory::responseFile( const std::string &fname, const int code, const std::string &comment) {
+t_Response responseFile( const std::string &fname, const int code, const std::string &comment) {
     
     
     ResponseFileStream &res = *(new ResponseFileStream(fname));
     res.getCodeComment() = comment;
     res.getCode() = code;
     return t_Response(&res);
+}
 }
     }
 }
