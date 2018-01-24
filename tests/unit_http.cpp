@@ -44,14 +44,14 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
     srv.filter_GET("/", [&]( Request &req )->void {
         req.queryString = "/hello";
     });
-    srv.GET( "/hello", []( Request &req )->t_Response {
+    srv.GET( "/hello", []( Request &req )->Response {
         return ResponseFactory::response("Hello in my world");
     } );
-    srv.GET( "/t", []( Request &req )->t_Response {
+    srv.GET( "/t", []( Request &req )->Response {
         auto params = req.getParams();
         return ResponseFactory::response("Hello in my world " + params["name"]);
     } );
-    srv.POST( "/t", []( Request &req )->t_Response {
+    srv.POST( "/t", []( Request &req )->Response {
         auto params = req.getParams();
         return ResponseFactory::response("Hello in my world " + params["a"] + " i " + params["lala"]);
     } );
@@ -67,7 +67,7 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
         req.proto = "HTTP/1.1";
         req.queryString = "/";
         req.remoteAddress = "localhost:" + std::to_string(port);
-        t_Response res = Http::doHttpQuery(req);
+        Response res = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res;
         REQUIRE(ss.str()=="Hello in my world");
@@ -79,7 +79,7 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
         req.proto = "HTTP/1.1";
         req.queryString = "/hello";
         req.remoteAddress = "localhost:" + std::to_string(port);
-        t_Response res = Http::doHttpQuery(req);
+        Response res = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res;
         REQUIRE(ss.str()=="Hello in my world");
@@ -91,7 +91,7 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
         req.proto = "HTTP/1.1";
         req.queryString = "/units.cpp";
         req.remoteAddress = "localhost:" + std::to_string(port);
-        t_Response res = Http::doHttpQuery(req);
+        Response res = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res;
         std::ifstream t("tests/units.cpp");
@@ -106,7 +106,7 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
         req.proto = "HTTP/1.1";
         req.queryString = "/t?name=gerwazy";
         req.remoteAddress = "localhost:" + std::to_string(port);
-        t_Response res = Http::doHttpQuery(req);
+        Response res = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res;
         REQUIRE(ss.str()=="Hello in my world gerwazy" );
@@ -121,7 +121,7 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
         req.header["content-type"] = "application/x-www-form-urlencoded";
         req.header["content-length"] = "3";
         req.setContent("lala=b%26d%26%20ty&a=b&jan=nowak");
-        t_Response res = Http::doHttpQuery(req);
+        Response res = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res;
         REQUIRE(ss.str()=="Hello in my world b i b&d& ty" );

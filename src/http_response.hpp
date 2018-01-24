@@ -29,94 +29,76 @@
 #include <vector>
 #include <memory>
 #include <sstream>
-
+#include <list>
 #include <map>
+#include <functional>
+#include <iostream>
 
 namespace tp {
-    namespace http {
-    
-class Response {
-    
+namespace http {
+
+
+class ResponseData {
 public:
-    
-    /**
-     * Returns fragment of response body
-     */
-    Response();
-    virtual ~Response();
-
-    virtual std::vector < char > getBytes(size_t partSize ) = 0;
-
-    virtual int &getCode()  = 0;
-    virtual std::string &getCodeComment()  = 0;
-    virtual std::map < std::string, std::string > &getHeader()  = 0;
-
-    virtual int getCode() const = 0;
-    virtual std::string getCodeComment() const = 0;
-    virtual std::map < std::string, std::string > getHeader() const = 0;
-
-    
+	virtual void *get() = 0;
 };
 
+class Response {
+protected:
 
-
-class ResponseStringStream : public Response {
-public:
-    int _code;
-    std::string _codeComment;
+	int _code;
+	std::string _codeComment;
 	std::map < std::string, std::string > _header;
 
-    std::stringstream ss;
-    std::vector < char > getBytes(size_t partSize);
+public:
 
-    int getCode() const;
-    std::string getCodeComment() const;
-    std::map < std::string, std::string > getHeader() const;
-    int &getCode() ;
-    std::string &getCodeComment() ;
-    std::map < std::string, std::string > &getHeader() ;
+	std::function < std::list < char >( const size_t ) > nextContentPart;
 
-    ResponseStringStream() {
-        _code = 200;
-        _codeComment = "ok";
-        _header["Content-Type"] = "text/html; charset=utf8";
-    }    
+	void code( const int c ) ;
+	int code() const;
+	std::string comment() const;
+	void comment( const std::string & ) ;
+
+	std::map < std::string, std::string > header() const;
+	void header( const std::map < std::string, std::string > &h ) ;
 };
 
-class t_Response : public Response {
+class ResponseStringBuffer : public Response {
+protected:
 public:
-    std::shared_ptr<Response> p_Response;
-    std::vector < char > getBytes(size_t partSize );
-    int &getCode() ;
-    std::string &getCodeComment() ;
-    std::map < std::string, std::string > &getHeader() ;
-    int getCode() const;
-    std::string getCodeComment() const;
-    std::map < std::string, std::string > getHeader() const;
 
-    t_Response(Response *newResponsePointer) : p_Response(newResponsePointer) {
-
-    }
-    t_Response() {
-        
-    }
+	ResponseStringBuffer( const std::string &s ) {
+    	std::shared_ptr < std::stringstream > data = std::make_shared<std::stringstream> (s );
+		_code = 200;
+		_codeComment = "ok";
+		_header["Content-Type"] = "text/html; charset=utf8";
+		nextContentPart = [data]( const size_t partSize ) {
+			std::list < char > ret;
+			std::stringstream &ss = *data.get();
+			std::vector < char > retB( partSize );
+			size_t s = ss.readsome ( retB.data(), partSize );
+			retB.resize( s );
+			for ( const auto &e : retB ) ret.push_back( e );
+			return ret;
+		};
+	}
 };
 
 //std::shared_ptr<Response> newResponsePtr(std::string responseType);
 // typedef std::shared_ptr<Response> t_Response;
-std::ostream& operator << ( std::ostream& os, t_Response & value_ );
+std::ostream& operator << ( std::ostream& os, Response & value_ );
 
 
 namespace ResponseFactory {
-    t_Response response( const std::string &responseString, const int code = 200, const std::string &comment = "OK");
-    t_Response responseFile( const std::string &fname, const int code = 200, const std::string &comment = "OK");
-    t_Response response( const std::vector < char > &responseString, const int code = 200, const std::string &comment = "OK");
+Response response( const std::string &responseString, const int code = 200, const std::string &comment = "OK" );
+Response responseFile( const std::string &fname, const int code = 200, const std::string &comment = "OK" );
+Response response( const std::vector < char > &responseString, const int code = 200, const std::string &comment = "OK" );
 };
 
 
 
-    
-    }
-}    
+
+}
+}
 
 #endif

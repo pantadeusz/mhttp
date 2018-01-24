@@ -40,12 +40,12 @@ int main ( int argc, char **argv ) {
 			if ( !loggedin ) req.queryString = "/";
 		} );
 
-		srv.GET( "/login", [&loggedin]( Request & )->t_Response {
+		srv.GET( "/login", [&loggedin]( Request & )->Response {
 			loggedin = true;
 			return ResponseFactory::response( "Logged in :D" );
 		} );
 
-		srv.GET( "/hello", []( Request & req )->t_Response {
+		srv.GET( "/hello", []( Request & req )->Response {
 			std::stringstream ss;
 			ss << "<p>Hello world!!</p><table>";
 			for ( auto p : req.getParams() ) ss << "<tr><td>" << p.first << "</td><td>" << p.second << "<td></tr>\r\n";
@@ -67,7 +67,7 @@ int main ( int argc, char **argv ) {
 			req.proto = "HTTP/1.1";
 			req.queryString = "/hello?witaj=januszu";
 			req.remoteAddress = "localhost:8090";
-			t_Response res = Http::doHttpQuery( req );
+			Response res = Http::doHttpQuery( req );
 			std::cout << res << std::endl;
 
 		}

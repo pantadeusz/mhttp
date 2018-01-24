@@ -186,7 +186,7 @@ Request Http::applyRequestFilters( const Request req_ ) {
 }
 
 
-t_Response Http::processRequests( const Request req ) {
+Response Http::processRequests( const Request req ) {
 	Request requ = req;
 
 	// find matching path
@@ -206,7 +206,7 @@ t_Response Http::processRequests( const Request req ) {
 	}
 
 
-	t_Response response; // odpowiedz
+	Response response; // odpowiedz
 	try {
 		response = handler( requ ); ///< actual response prepare
 	} catch ( std::exception &e ) {
@@ -220,12 +220,12 @@ t_Response Http::processRequests( const Request req ) {
 	return response;
 }
 
-int Http::sendResponse( SocketInterface & clientsocket, t_Response resp ) {
+int Http::sendResponse( SocketInterface & clientsocket, Response resp ) {
 	std::stringstream sent;
-	sent << "HTTP/1.1 " <<  resp.getCode()  << " - " << resp.getCodeComment();
+	sent << "HTTP/1.1 " <<  resp.code()  << " - " << resp.comment();
 	sent << "\r\nServer: PuzniakowskiHttp " << VER;
 	sent << "\r\nConnection: close";
-	for ( auto & h : resp.getHeader() ) {
+	for ( auto & h : resp.header() ) {
 		sent << "\r\n" << h.first << ": " << h.second;
 	}
 	sent << "\r\n\r\n";
@@ -233,11 +233,13 @@ int Http::sendResponse( SocketInterface & clientsocket, t_Response resp ) {
 	std::string sdata = sent.str();
 	clientsocket.write( sdata.data(), sdata.length() );
 	{
-		std::vector < char > bread;
+		std::list < char > bread;
 		do {
-			bread = resp.getBytes( 1024 );
+			bread = resp.nextContentPart( 1024 );
 			if ( bread.size() > 0 ) {
-				clientsocket.write( bread.data(), bread.size() );
+				for (char c:bread) {
+					clientsocket.write( &c, 1 );
+				}
 			}
 		} while ( bread.size() > 0 );
 	}
@@ -271,7 +273,7 @@ int Http::acceptConnection() {
 					auto s = clientsocket;
 					Request requ = getRequest( s );
 					requ = applyRequestFilters( requ );
-					t_Response response = processRequests( requ );
+					Response response = processRequests( requ );
 					return sendResponse( s, response );
 
 				} catch ( ... ) {
@@ -321,7 +323,7 @@ Http::~Http () {
 
 
 t_requHandler getStaticFileHandler( const std::string sprefix, const bool safe_path ) {
-	return [ = ]( Request & req )->t_Response {
+	return [ = ]( Request & req )->Response {
 		std::string fn;
 		if ( req.pathSubmatches.size() > 1 ) fn = req.pathSubmatches[1];
 		else fn = req.getPath();
@@ -337,7 +339,7 @@ t_requHandler getStaticFileHandler( const std::string sprefix, const bool safe_p
 
 
 
-t_requHandler Http::notFoundHandler = []( Request & )->t_Response {
+t_requHandler Http::notFoundHandler = []( Request & )->Response {
 	return ResponseFactory::response( "Page not found", 404,  "not found" );
 };
 
@@ -348,7 +350,7 @@ void Http::start() {
 	}
 }
 
-t_Response Http::doHttpQuery( Request req ) {
+Response Http::doHttpQuery( Request req ) {
 	std::string port = "80";
 	std::string host = req.remoteAddress;
 	if ( req.remoteAddress.find( ":" ) != std::string::npos ) {
@@ -398,7 +400,7 @@ t_Response Http::doHttpQuery( Request req ) {
 	std::stringstream ss( trim( response ) );
 	ss >> rproto >> rcode >>  rcomment;
 	auto ret = ResponseFactory::response( data, rcode, rcomment );
-	ret.getHeader() = header;
+	ret.header(header);
 	return ret;
 }
 }

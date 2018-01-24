@@ -43,7 +43,7 @@ namespace http {
 
 
 
-typedef std::function < t_Response ( Request & )> t_requHandler;
+typedef std::function < Response ( Request & )> t_requHandler;
 typedef std::function < void( Request & ) > t_filterHandler;
 
 
@@ -70,19 +70,19 @@ private:
 	std::future < int > acceptingWorker;
 
 	bool terminateServerLoop; ///< does the main server loop should be terminated?
-	
+
 
 	static Request getRequest( SocketInterface & clientsocket );
 	Request applyRequestFilters( const Request req_ );
-	t_Response processRequests( const Request req ) ;
-	static int sendResponse( SocketInterface & clientsocket, t_Response response );
+	Response processRequests( const Request req ) ;
+	static int sendResponse( SocketInterface & clientsocket, Response response );
 
 
 public:
 
 	/**
 	 * @brief Reads first line of HTTP request
-	 * 
+	 *
 	 * @param s connected socket
 	 * @return  std::string first line of http transmission
 	 ************/
@@ -90,15 +90,15 @@ public:
 
 	/**
 	 * @brief Read HTTP header lines and form map of the Key - Value pairs of header lines
-	 * 
+	 *
 	 * @param sock connected socket
-	 * @return std::map<std::string, std::string> 
+	 * @return std::map<std::string, std::string>
 	 ************/
 	static std::map<std::string, std::string> readHttpHeader( SocketInterface & sock );
 
 	/**
 	 * @brief Read HTTP data - especially for POST requests
-	 * 
+	 *
 	 * @param clientsocket conneced socket
 	 * @param dataSize the size of data determined by content-size
 	 * @return std::vector <char> returned data
@@ -109,43 +109,43 @@ public:
 
 	/**
 	 * @brief adds handler for GET requests. It will check mappings in order
-	 * 
+	 *
 	 * @param mapping the URL pattern (regex) for request
 	 * @param f request handler for mapping
 	 ************/
 	virtual void GET( const std::string &mapping, t_requHandler f );
 	/**
 	 * @brief adds handler for POST requests. It will check mappings in order
-	 * 
+	 *
 	 * @param mapping the URL pattern (regex) for request
 	 * @param f request handler for mapping
 	 ************/
 	virtual void POST( const std::string &mapping, t_requHandler f );
-		/**
-	 * @brief adds handler for DELETE requests. It will check mappings in order
-	 * 
-	 * @param mapping the URL pattern (regex) for request
-	 * @param f request handler for mapping
-	 ************/
+	/**
+	* @brief adds handler for DELETE requests. It will check mappings in order
+	*
+	* @param mapping the URL pattern (regex) for request
+	* @param f request handler for mapping
+	************/
 	virtual void DELETE( const std::string &mapping, t_requHandler f );
 
 	/**
 	 * @brief adds filter for mapping. Filter will transform Request. It chan change path and other elements of the request
-	 * 
+	 *
 	 * @param mapping the regex for matchin URL
 	 * @param f handler - the function that will transform requests
 	 ************/
 	void filter_GET( const std::string &mapping, t_filterHandler f );
 	/**
 	 * @brief adds filter for mapping. Filter will transform Request. It chan change path and other elements of the request
-	 * 
+	 *
 	 * @param mapping the regex for matchin URL
 	 * @param f handler - the function that will transform requests
 	 ************/
 	void filter_POST( const std::string &mapping, t_filterHandler f );
 	/**
 	 * @brief adds filter for mapping. Filter will transform Request. It chan change path and other elements of the request
-	 * 
+	 *
 	 * @param mapping the regex for matchin URL
 	 * @param f handler - the function that will transform requests
 	 ************/
@@ -174,7 +174,7 @@ public:
 	};
 
 	// performs get operation
-	static t_Response doHttpQuery( Request req );
+	static Response doHttpQuery( Request req );
 } Http;
 
 
