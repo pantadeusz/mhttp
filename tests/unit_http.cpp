@@ -44,7 +44,7 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
     srv.filter_GET("/", [&]( Request &req )->void {
         req.queryString = "/hello";
     });
-    srv.GET( "/hello", []( Request &req )->Response {
+    srv.GET( "/hello", []( Request & )->Response {
         return ResponseFactory::response("Hello in my world");
     } );
     srv.GET( "/t", []( Request &req )->Response {
