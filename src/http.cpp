@@ -233,15 +233,9 @@ int Http::sendResponse( SocketInterface & clientsocket, Response resp ) {
 	std::string sdata = sent.str();
 	clientsocket.write( sdata.data(), sdata.length() );
 	{
-		std::list < char > bread;
-		do {
-			bread = resp.nextContentPart( 1024 );
-			if ( bread.size() > 0 ) {
-				for (char c:bread) {
-					clientsocket.write( &c, 1 );
-				}
-			}
-		} while ( bread.size() > 0 );
+		resp.readContent([&](const std::list < char > &bread, const response_status_t&){
+			for (char c:bread) clientsocket.write( &c, 1 );
+		});
 	}
 	clientsocket.shutdownOut();
 	return 1;

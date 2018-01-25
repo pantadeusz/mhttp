@@ -43,6 +43,9 @@ public:
 	virtual void *get() = 0;
 };
 
+using response_status_t = int;
+using response_callback_t = std::function < void ( const std::list < char > &, const response_status_t & ) >;
+
 class Response {
 protected:
 
@@ -50,9 +53,10 @@ protected:
 	std::string _codeComment;
 	std::map < std::string, std::string > _header;
 
+	bool _data_available; // additional information about availablility of data to read.
 public:
 
-	std::function < std::list < char >( const size_t ) > nextContentPart;
+	std::function < void ( const response_callback_t & ) > readContent;
 
 	void code( const int c ) ;
 	int code() const;
@@ -67,19 +71,26 @@ class ResponseStringBuffer : public Response {
 protected:
 public:
 
-	ResponseStringBuffer( const std::string &s ) {
-    	std::shared_ptr < std::stringstream > data = std::make_shared<std::stringstream> (s );
+	ResponseStringBuffer( const std::string &s_ ) {
 		_code = 200;
 		_codeComment = "ok";
 		_header["Content-Type"] = "text/html; charset=utf8";
-		nextContentPart = [data]( const size_t partSize ) {
-			std::list < char > ret;
-			std::stringstream &ss = *data.get();
-			std::vector < char > retB( partSize );
-			size_t s = ss.readsome ( retB.data(), partSize );
-			retB.resize( s );
-			for ( const auto &e : retB ) ret.push_back( e );
-			return ret;
+		std::string sr = s_;
+		readContent = [sr]( const response_callback_t &f ) {
+			size_t partSize = 100;
+			size_t s = 0;
+			std::stringstream ss (sr );
+			do {
+				std::list < char > ret;
+				char retB[partSize];
+				s = ss.readsome ( retB, partSize );
+				for ( unsigned int i = 0; i < s; i++ ) ret.push_back( retB[i] );
+				if (s == partSize) {
+					f(ret, false);
+				} else {
+					f(ret, true);
+				}
+			} while (s == partSize);
 		};
 	}
 };

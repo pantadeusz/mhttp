@@ -35,11 +35,9 @@ namespace http {
 
 
 std::ostream& operator << ( std::ostream& os, Response & value ) {
-	std::list < char > buf;
-	do {
-		auto buf = value.nextContentPart( 1024 );
-		for ( char c : buf ) os << c;
-	} while ( buf.size() > 0 );
+	value.readContent( [&]( const std::list < char > &bread, const response_status_t& ) {
+		for ( char c : bread ) os << c;
+	} );
 	return os;
 }
 
@@ -65,13 +63,18 @@ void Response::header( const std::map < std::string, std::string > &h ) {
 
 class ResponseFileStream : public Response {
 protected:
-	
+
 public:
-	ResponseFileStream( const std::string &fname ) {
-    	std::shared_ptr < std::ifstream > data = std::make_shared<std::ifstream> (fname, std::ios::binary );
+	ResponseFileStream( const std::string &fname_ ) {
 		_code = 200;
 		_codeComment = "ok";
-		auto &ss = *data.get();
+
+
+
+		std::string fname = fname_;
+
+
+		std::ifstream ss( fname, std::ios::binary );
 
 		if ( ss.fail() ) {
 			throw std::length_error( "could not read file!" );
@@ -83,13 +86,26 @@ public:
 			_header["Content-Type"] = mime;
 		}
 
-		nextContentPart = [ data ]( size_t partSize )  {
-			std::vector < char > ret( partSize );
-			std::ifstream &ss = *data.get();
 
-			size_t s = ss.readsome ( ret.data(), partSize );
-			ret.resize( s );
-			return std::list<char>( ret.begin(), ret.end() );
+		readContent = [fname]( const response_callback_t &f ) {
+			std::ifstream ss( fname, std::ios::binary );
+
+			if ( ss.fail() ) {
+				throw std::length_error( "could not read file!" );
+			}
+			size_t partSize = 100;
+			size_t s = 0;
+			do {
+				std::list < char > ret;
+				char retB[partSize];
+				s = ss.readsome ( retB, partSize );
+				for ( unsigned int i = 0; i < s; i++ ) ret.push_back( retB[i] );
+				if ( s == partSize ) {
+					f( ret, false );
+				} else {
+					f( ret, true );
+				}
+			} while ( s == partSize );
 		};
 	};
 };
