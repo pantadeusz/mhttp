@@ -37,63 +37,60 @@
 namespace tp {
 namespace http {
 
-
-class ResponseData {
-public:
-	virtual void *get() = 0;
-};
-
 using response_status_t = int;
 using response_callback_t = std::function < void ( const std::list < char > &, const response_status_t & ) >;
 
 class Response {
 protected:
-
-	int _code;
-	std::string _codeComment;
-	std::map < std::string, std::string > _header;
-
+	int _code; // response code
+	std::string _codeComment; // response code comment
+	std::map < std::string, std::string > _header; // the headers
 	bool _data_available; // additional information about availablility of data to read.
 public:
 
+	/**
+	 * function for reading content. It will call response callback multiple times with chunks of data.
+	 * This is similar to the solution given in NodeJS fs
+	 * */
 	std::function < void ( const response_callback_t & ) > readContent;
-
-	void code( const int c ) ;
+	/**
+	 * get response HTTP code
+	 * */
 	int code() const;
+	/**
+	 * set response HTTP code
+	 * */
+	void code( const int c ) ;
+	/**
+	 * get response HTTP code comment
+	 * */
 	std::string comment() const;
+	/**
+	 * set response HTTP code commment
+	 * */
 	void comment( const std::string & ) ;
 
+	/**
+	 * get response HTTP headers
+	 * */
 	std::map < std::string, std::string > header() const;
+	/**
+	 * set response HTTP headers
+	 * */
 	void header( const std::map < std::string, std::string > &h ) ;
+	/**
+	 * set response HTTP header value
+	 * */
 	void header( const std::string &k, const std::string &v ) ;
 };
 
+/**
+ * Response as a string buffer. It can be read multiple times.
+ * */
 class ResponseStringBuffer : public Response {
 protected:
 public:
-
-	ResponseStringBuffer( const std::string &s_ ) {
-		_code = 200;
-		_codeComment = "ok";
-		_header["Content-Type"] = "text/html; charset=utf8";
-		std::string sr = s_;
-		readContent = [sr]( const response_callback_t &f ) {
-			size_t partSize = 100;
-			size_t s = 0;
-			std::stringstream ss (sr );
-			do {
-				std::list < char > ret;
-				char retB[partSize];
-				s = ss.readsome ( retB, partSize );
-				for ( unsigned int i = 0; i < s; i++ ) ret.push_back( retB[i] );
-				if (s == partSize) {
-					f(ret, false);
-				} else {
-					f(ret, true);
-				}
-			} while (s == partSize);
-		};
-	}
+	ResponseStringBuffer( const std::string &s_ ) ;
 };
 
 std::ostream& operator << ( std::ostream& os, Response & value_ );

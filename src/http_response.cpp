@@ -65,6 +65,29 @@ void Response::header( const std::string &k, const std::string &v ) {
 }
 
 
+ResponseStringBuffer::ResponseStringBuffer( const std::string &s_ ) {
+	_code = 200;
+	_codeComment = "ok";
+	_header["Content-Type"] = "text/html; charset=utf8";
+	std::string sr = s_;
+	readContent = [sr]( const response_callback_t &f ) {
+		size_t partSize = 100;
+		size_t s = 0;
+		std::stringstream ss ( sr );
+		do {
+			std::list < char > ret;
+			char retB[partSize];
+			s = ss.readsome ( retB, partSize );
+			for ( unsigned int i = 0; i < s; i++ ) ret.push_back( retB[i] );
+			if ( s == partSize ) {
+				f( ret, false );
+			} else {
+				f( ret, true );
+			}
+		} while ( s == partSize );
+	};
+}
+
 class ResponseFileStream : public Response {
 protected:
 
