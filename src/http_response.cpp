@@ -60,6 +60,10 @@ void Response::comment( const std::string &cc ) {
 void Response::header( const std::map < std::string, std::string > &h ) {
 	_header = h;
 }
+void Response::header( const std::string &k, const std::string &v ) {
+	_header[k] = v;
+}
+
 
 class ResponseFileStream : public Response {
 protected:

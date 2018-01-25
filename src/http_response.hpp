@@ -65,6 +65,7 @@ public:
 
 	std::map < std::string, std::string > header() const;
 	void header( const std::map < std::string, std::string > &h ) ;
+	void header( const std::string &k, const std::string &v ) ;
 };
 
 class ResponseStringBuffer : public Response {
