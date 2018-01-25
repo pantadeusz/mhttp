@@ -72,10 +72,10 @@ private:
 	bool terminateServerLoop; ///< does the main server loop should be terminated?
 
 
-	static Request getRequest( SocketInterface & clientsocket );
+	static Request getRequest( Socket & clientsocket );
 	Request applyRequestFilters( const Request req_ );
 	Response processRequests( const Request req ) ;
-	static int sendResponse( SocketInterface & clientsocket, Response response );
+	static int sendResponse( Socket & clientsocket, Response response );
 
 
 public:
@@ -86,7 +86,7 @@ public:
 	 * @param s connected socket
 	 * @return  std::string first line of http transmission
 	 ************/
-	static std::string readHttpRequestLine( SocketInterface & s );
+	static std::string readHttpRequestLine( Socket & s );
 
 	/**
 	 * @brief Read HTTP header lines and form map of the Key - Value pairs of header lines
@@ -94,7 +94,7 @@ public:
 	 * @param sock connected socket
 	 * @return std::map<std::string, std::string>
 	 ************/
-	static std::map<std::string, std::string> readHttpHeader( SocketInterface & sock );
+	static std::map<std::string, std::string> readHttpHeader( Socket & sock );
 
 	/**
 	 * @brief Read HTTP data - especially for POST requests
@@ -103,7 +103,7 @@ public:
 	 * @param dataSize the size of data determined by content-size
 	 * @return std::vector <char> returned data
 	 ************/
-	static std::vector <char> readHttpData( SocketInterface & clientsocket, size_t dataSize );
+	static std::vector <char> readHttpData( Socket & clientsocket, size_t dataSize );
 
 
 

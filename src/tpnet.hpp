@@ -31,56 +31,40 @@
 namespace tp {
 namespace http {
 
-    class SocketInterface {
-    public:
-        virtual int write (const void * buf, size_t bufsize) = 0;
-        virtual int read(void * buf, size_t bufsize) = 0;
-        virtual int close() = 0;
-        virtual int shutdownOut() = 0;
-        virtual std::string getHost() = 0;
-    };
+class Socket {
+protected:
+    Socket(){}
+public:
+	std::string _host;
+	std::string _port;
+	std::shared_ptr<int> s;
 
+	int write ( const void * buf, size_t bufsize );
+	int read( void * buf, size_t bufsize );
+    int shutdown();
+    int close();
 
-    class ConnectedSocket : public SocketInterface {
-    protected:
-        std::shared_ptr<int> refcounter;
-        int sfd;
-    public:
-        std::string _host;
-        std::string _service;
-    
-        ConnectedSocket(int s);
-        ConnectedSocket();
-        
-    
-        virtual ~ConnectedSocket();
-    
-        int write (const void * buf, size_t bufsize);
-    
-        int read (void * buf, size_t bufsize);
-        int close ();
-        int shutdownOut();
-        std::string getHost() {return _host;};
-        
-    };
-    
-    class ListeningSocket : public ConnectedSocket {
-    
-    public:
-        ListeningSocket(std::string host, std::string port);
-    
-        ConnectedSocket accept();
-    };
-    
-    class ClientSocket : public ConnectedSocket {
-    protected:
-        ClientSocket(int s); 
-    public:
-    
-        static ClientSocket connectTo(const std::string service, const std::string host);
-    
-    };
-    
+	std::string getHost() {
+		return _host;
+	};
+
+	int sfd();
+	Socket( int s_ );
+};
+
+class ListeningSocket : public Socket {
+public:
+	ListeningSocket( std::string host, std::string port );
+	Socket accept();
+};
+
+class ClientSocket : public Socket {
+public:
+
+	ClientSocket( const std::string service, const std::string host );
+
+};
+
 
 }
 }

@@ -88,7 +88,7 @@ void Http::filter_DELETE( const std::string &mapping, t_filterHandler f ) {
 	filterMappings["DELETE"].push_back( { std::regex( mapping ), f } );
 }
 
-std::string Http::readHttpRequestLine( SocketInterface & s ) {
+std::string Http::readHttpRequestLine( Socket & s ) {
 	char c[2] = {0, 0};
 	std::string ret = "";
 	auto bytesRead = s.read(  c, 1 );
@@ -101,14 +101,14 @@ std::string Http::readHttpRequestLine( SocketInterface & s ) {
 		c[1] = c[0];
 		bytesRead = s.read(  c, 1 );
 		if ( bytesRead < 0 ) {
-			std::cout << "bytesRead = " << bytesRead << "; ERRNO " << strerror(errno) << std::endl;
+			std::cout << "bytesRead = " << bytesRead << "; ERRNO " << strerror( errno ) << std::endl;
 		}
 	}
 	if ( ret.length() > 2 ) return ret.substr( 0, ret.length() - 2 );
 	return ret;
 }
 
-std::map<std::string, std::string> Http::readHttpHeader( SocketInterface & sock ) {
+std::map<std::string, std::string> Http::readHttpHeader( Socket & sock ) {
 	char c;
 	std::map<std::string, std::string> retTxt;
 
@@ -132,7 +132,7 @@ std::map<std::string, std::string> Http::readHttpHeader( SocketInterface & sock 
 
 
 
-std::vector <char> Http::readHttpData( SocketInterface & clientsocket, size_t dataSize ) {
+std::vector <char> Http::readHttpData( Socket & clientsocket, size_t dataSize ) {
 	std::vector <char> ret;
 	ret.reserve( dataSize );
 	char dataPart[512];
@@ -148,7 +148,7 @@ std::vector <char> Http::readHttpData( SocketInterface & clientsocket, size_t da
 	return ret;
 }
 
-Request Http::getRequest( SocketInterface &clientsocket ) {
+Request Http::getRequest( Socket &clientsocket ) {
 	Request requ;
 	requ.remoteAddress = clientsocket.getHost();
 	std::string requestLine = readHttpRequestLine( clientsocket );
@@ -220,7 +220,7 @@ Response Http::processRequests( const Request req ) {
 	return response;
 }
 
-int Http::sendResponse( SocketInterface & clientsocket, Response resp ) {
+int Http::sendResponse( Socket & clientsocket, Response resp ) {
 	std::stringstream sent;
 	sent << "HTTP/1.1 " <<  resp.code()  << " - " << resp.comment();
 	sent << "\r\nServer: PuzniakowskiHttp " << VER;
@@ -233,11 +233,11 @@ int Http::sendResponse( SocketInterface & clientsocket, Response resp ) {
 	std::string sdata = sent.str();
 	clientsocket.write( sdata.data(), sdata.length() );
 	{
-		resp.readContent([&](const std::list < char > &bread, const response_status_t&){
-			for (char c:bread) clientsocket.write( &c, 1 );
-		});
+		resp.readContent( [&]( const std::list < char > &bread, const response_status_t& ) {
+			for ( char c : bread ) clientsocket.write( &c, 1 );
+		} );
 	}
-	clientsocket.shutdownOut();
+	clientsocket.shutdown();
 	return 1;
 }
 
@@ -259,6 +259,7 @@ int Http::acceptConnection() {
 				}
 			}
 		}
+
 		{
 			std::lock_guard<std::mutex> guard( workers_mutex );
 			workers.push_back( std::async( std::launch::async, [this, clientsocket]()->int{
@@ -277,6 +278,7 @@ int Http::acceptConnection() {
 
 			} ) );
 		}
+
 	} catch ( ... ) {
 		std::cout << "Internal server error!!!";
 		return -1;
@@ -351,7 +353,7 @@ Response Http::doHttpQuery( Request req ) {
 		host = req.remoteAddress.substr( 0, req.remoteAddress.find( ":" ) );
 		port = req.remoteAddress.substr( req.remoteAddress.find( ":" ) + 1 );
 	}
-	ClientSocket srv = ClientSocket::connectTo( port, host );
+	ClientSocket srv( port, host );
 
 	{
 		std::stringstream ss;
@@ -373,7 +375,7 @@ Response Http::doHttpQuery( Request req ) {
 		std::string s = ss.str();
 		srv.write( s.data(), s.size() ); // send request
 	}
-	srv.shutdownOut();
+	srv.shutdown();
 	std::string response = Http::readHttpRequestLine( srv );
 	std::map<std::string, std::string> header = Http::readHttpHeader( srv );
 	std::vector <char> data;
@@ -394,7 +396,7 @@ Response Http::doHttpQuery( Request req ) {
 	std::stringstream ss( trim( response ) );
 	ss >> rproto >> rcode >>  rcomment;
 	auto ret = ResponseFactory::response( data, rcode, rcomment );
-	ret.header(header);
+	ret.header( header );
 	return ret;
 }
 }

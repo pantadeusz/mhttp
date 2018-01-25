@@ -95,8 +95,6 @@ public:
 	}
 };
 
-//std::shared_ptr<Response> newResponsePtr(std::string responseType);
-// typedef std::shared_ptr<Response> t_Response;
 std::ostream& operator << ( std::ostream& os, Response & value_ );
 
 
