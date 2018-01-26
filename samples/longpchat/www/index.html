@@ -12,10 +12,10 @@
 
         $(document).ready(function () {
 
-            $.ajax({
+            var ajaxpromise = $.ajax({
                 url: "/api/token",
                 context: document.body
-            }).done(function (data) {
+            }).then(function (data) {
                 var myid = data;
                 doajax(myid);
             });
@@ -45,6 +45,7 @@
                     data['messages'].forEach(element => {
                         $("#messages li:last").append("<li>" + element + "</li>");
                     });
+                }).done(function () {
                     doajax(myid);
                 });
             }

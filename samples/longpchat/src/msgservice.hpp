@@ -40,8 +40,10 @@ public:
 
 	std::list<message_t> wait_message( const std::string &id_, int timeout = 10000 ) {
 		std::unique_lock<std::mutex> lk( cv_m_ );
-		cv_.wait_for( lk, std::chrono::milliseconds( timeout ), [this, id_] {return messages_[id_].size() > 0;} );
-
+		cv_.wait_for( lk, std::chrono::milliseconds( timeout ), [this, id_] {
+			std::lock_guard<std::mutex> lock( messages_m_ );
+			return messages_[id_].size() > 0;
+		} );
 		{
 			std::lock_guard<std::mutex> lock( messages_m_ );
 			auto ret = messages_[id_];

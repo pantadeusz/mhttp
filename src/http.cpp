@@ -92,7 +92,6 @@ std::string Http::readHttpRequestLine( Socket & s ) {
 	char c[2] = {0, 0};
 	std::string ret = "";
 	auto bytesRead = s.read(  c, 1 );
-	if ( bytesRead <= 0 ) std::cout << "!!tesRead = " << bytesRead << std::endl;
 	while ( bytesRead > 0 ) {
 		ret = ret + c[0];
 		if ( ( c[0] == '\n' ) && ( c[1] == '\r' ) ) {
