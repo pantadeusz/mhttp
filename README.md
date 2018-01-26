@@ -42,110 +42,65 @@ LD_LIBRARY_PATH=. ./a.out
 ```
 
 
-### server for static contents
+### sample server
 
 ```c++
-#include <http.hpp>
-#include <string>
+/*
 
-using namespace tp::http;
-using namespace std;
+    Copyright (C) 2017 Tadeusz Puźniakowski
 
-int main ( int argc, char **argv ) {
-    Http srv( "localhost", 8090, true );
-    srv.GET("/(.*)",getStaticFileHandler("",true));
-    srv.start();
-    return 0;
-}
-```
+    This file is part of mhttp.
 
-### server for static contents with filter that will redirect / to /index.html
+    This file is an example usage of Http class. You can use it like a part of documentation, you can
+    copy, modify and incorporate in other projects without any limitation.
 
-```c++
-#include <http.hpp>
-#include <string>
 
-using namespace tp::http;
-using namespace std;
+*/
 
-int main ( int argc, char **argv ) {
-    Http srv( "localhost", 8090, true );
-    srv.filter_GET("/", [&]( Request &req )->void {
-        req.queryString = "/index.html";
-    });
-    srv.GET("/(.*)",getStaticFileHandler("",true));
-    srv.start();
-    return 0;
-}
-```
-
-### server with dynamic /hello page
-
-```c++
-#include <http.hpp>
-#include <string>
-
-using namespace tp::http;
-using namespace std;
-
-int main ( int argc, char **argv ) {
-    Http srv( "localhost", 8090, true );
-    srv.GET( "/hello", [&]( Request &req )->t_Response {
-        return ResponseFactory::response("Hello server");
-    } );
-    srv.start();
-    return 0;
-}
-```
-
-### server /hello page that returns list of http arguments
-
-```c++
-#include <http.hpp>
-#include <string>
+#include <iostream>
 #include <sstream>
+#include <string>
+#include <http.hpp>
+#include <chrono>
+#include <thread>
+#include <fstream>
+
 
 using namespace tp::http;
 using namespace std;
 
 int main ( int argc, char **argv ) {
     Http srv( "localhost", 8090, true );
-    auto handler = []( Request &req )->t_Response {
+
+    srv.filter_GET( "/", [&]( Request & req )->void {
+        req.queryString = "/index.html";
+    } );
+
+    srv.GET( "/hello", []( Request & req )->Response {
         std::stringstream ss;
         ss << "<p>Hello world!!</p><table>";
-        for (auto p : req.getParams()) ss << "<tr><td>" << p.first << "</td><td>" << p.second << "<td></tr>\r\n";
+        for ( auto p : req.getParams() ) ss << "<tr><td>" << p.first << "</td><td>" << p.second << "<td></tr>\r\n";
         ss << "</table>";
-        return ResponseFactory::response(ss.str(), 200, "OK");
-    };
-    srv.GET( "/hello", handler );
-    srv.POST( "/hello", handler );
-    srv.start();
-    return 0;
+        return ResponseFactory::response( ss.str(), 200, "OK" );
+    } );
+
+    srv.GET( "/(.*)", getStaticFileHandler( "", true ) );
+
+    std::thread t( [&]() {
+        srv.start();
+    } );
+    t.detach();
+
+    std::cout << "---server " << VER << " started. type some text to exit --" << std::endl;
+    std::string i;
+    std::cin >> i;
+    std::cout << "Closing server" << std::endl;
+    srv.stop();
+	std::cout << "Closing server - OK" << std::endl;
+	return 0;
 }
 ```
 
-### Session handling
-
-Filter with session:
-```c++
-    srv.filter_sGET("/", [&]( Request &req, Session & )->void {
-        req.queryString = "/index.html";
-    });
-```
-
-Request handle with session:
-
-
-```c++
-    srv.sGET( "/session", [&]( Request &, Session &session )->t_Response {
-        if (session.getSessionData() == NULL) {
-            session.setSessionData(new StringSessionData());
-        }
-        auto sd = session.getSessionData();
-        sd->fromString(sd->toString() + "x "); // append x to session data string
-        return ResponseFactory::response("Session ID = " + sd->toString());
-    } );
-```
 
 
 ### C++14 features
@@ -160,4 +115,4 @@ You can use C++14 features, for shorter notation of lambdas:
 
 ### donations
 
-I accept donations in BTC at 1cezmsed5u3cWR2JsjzPp9gvHjzrArDiA
+I accept donations in BTC at bc1q2rs40jcs9849hyph97am48xewzdf8ctfr6hsmx
