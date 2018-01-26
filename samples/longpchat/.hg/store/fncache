@@ -1,0 +1,10 @@
+data/www/index.html.i
+data/thirdparty/catch/catch.hpp.i
+data/build/.placeholder.i
+data/thirdparty/catch/LICENSE.txt.i
+data/src/api.hpp.i
+data/www/.placeholder.i
+data/src/api.cpp.i
+data/src/msgservice.hpp.i
+data/www/jquery.js.i
+data/CMakeLists.txt.i

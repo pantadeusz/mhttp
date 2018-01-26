@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+</head>
+
+<body>
+    <script src="jquery.js" lang="javascript"></script>
+    <script lang="javascript">
+
+        $(document).ready(function () {
+
+            $.ajax({
+                url: "/api/token",
+                context: document.body
+            }).done(function (data) {
+                var myid = data;
+                doajax(myid);
+            });
+            var submitMessage = function () {
+                $.ajax({
+                    url: "/api/message",
+                    method: "POST",
+                    context: document.body,
+                    data: $("#msg").val()
+                }).done(function (data) {
+                });
+            };
+
+            $('#msgsend').on("click", function () {
+                submitMessage();
+            });
+            $('#msg').keypress(function (e) {
+                if (e.which == 13) {
+                    submitMessage();
+                    return false;    //<---- Add this line
+                }
+            });
+
+            var doajax = function (myid) {
+                $.getJSON("/api/message?id=" + myid, function (data) {
+                    console.log(data);
+                    data['messages'].forEach(element => {
+                        $("#messages li:last").append("<li>" + element + "</li>");
+                    });
+                    doajax(myid);
+                });
+            }
+
+        }); 
+    </script>
+
+    <input type="text" value="" id="msg" />
+    <input type="button" value="wyslij" id="msgsend" />
+    <ul id="messages">
+        <li></li>
+    </ul>
+</body>
+
+</html>
