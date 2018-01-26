@@ -1,6 +1,6 @@
-# Long Poll demo
+# Hello world !!
 
-This app shows how to start with simple chat.
+This is starter project
 
 ## Build
 
@@ -15,5 +15,3 @@ cd ..
 
 And then type in web browser:
 (http://localhost:5555)[http://localhost:5555]
-
-You can open multiple windows to see the chat going :)

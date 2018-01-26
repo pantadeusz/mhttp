@@ -9,7 +9,9 @@ The intention of this project is to provide lightweight server for
 Internet of Things applications, where there is need to access hardware
 directly via C or C++ code.
 
+## Example projects
 
+ [samples][samples]
 
 
 ## Compilation
@@ -45,18 +47,6 @@ LD_LIBRARY_PATH=. ./a.out
 ### sample server
 
 ```c++
-/*
-
-    Copyright (C) 2017 Tadeusz Puźniakowski
-
-    This file is part of mhttp.
-
-    This file is an example usage of Http class. You can use it like a part of documentation, you can
-    copy, modify and incorporate in other projects without any limitation.
-
-
-*/
-
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -64,7 +54,6 @@ LD_LIBRARY_PATH=. ./a.out
 #include <chrono>
 #include <thread>
 #include <fstream>
-
 
 using namespace tp::http;
 using namespace std;
