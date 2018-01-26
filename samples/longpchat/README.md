@@ -14,6 +14,6 @@ cd ..
 ```
 
 And then type in web browser:
-(http://localhost:5555)[http://localhost:5555]
+[http://localhost:5555](http://localhost:5555)
 
 You can open multiple windows to see the chat going :)
