@@ -11,7 +11,7 @@ directly via C or C++ code.
 
 ## Example projects
 
- [samples][samples]
+  [samples](samples)
 
 
 ## Compilation
