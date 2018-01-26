@@ -233,9 +233,11 @@ int Http::sendResponse( Socket & clientsocket, Response resp ) {
 	std::string sdata = sent.str();
 	clientsocket.write( sdata.data(), sdata.length() );
 	{
-		resp.readContent( [&]( const std::list < char > &bread, const response_status_t& ) {
+		std::cout << "reading..." << std::endl;
+		resp.readContent( [&]( const std::vector < char > &bread, const response_status_t& ) {
 			for ( char c : bread ) clientsocket.write( &c, 1 );
 		} );
+		std::cout << "reading... OK" << std::endl;
 	}
 	clientsocket.shutdown();
 	return 1;

@@ -35,7 +35,7 @@ namespace http {
 
 
 std::ostream& operator << ( std::ostream& os, Response & value ) {
-	value.readContent( [&]( const std::list < char > &bread, const response_status_t& ) {
+	value.readContent( [&]( const std::vector < char > &bread, const response_status_t& ) {
 		for ( char c : bread ) os << c;
 	} );
 	return os;
@@ -71,20 +71,11 @@ ResponseStringBuffer::ResponseStringBuffer( const std::string &s_ ) {
 	_header["Content-Type"] = "text/html; charset=utf8";
 	std::string sr = s_;
 	readContent = [sr]( const response_callback_t &f ) {
-		size_t partSize = 100;
-		size_t s = 0;
-		std::stringstream ss ( sr );
-		do {
-			std::list < char > ret;
-			char retB[partSize];
-			s = ss.readsome ( retB, partSize );
-			for ( unsigned int i = 0; i < s; i++ ) ret.push_back( retB[i] );
-			if ( s == partSize ) {
-				f( ret, false );
-			} else {
-				f( ret, true );
-			}
-		} while ( s == partSize );
+		std::cout << "read from string buffer..." << std::endl;
+		std::vector < char > ret( sr.begin(), sr.end() );
+		f( ret, false );
+
+		std::cout << "read from string buffer...OK" << std::endl;
 	};
 }
 
@@ -96,10 +87,7 @@ public:
 		_code = 200;
 		_codeComment = "ok";
 
-
-
 		std::string fname = fname_;
-
 
 		std::ifstream ss( fname, std::ios::binary );
 
@@ -115,6 +103,7 @@ public:
 
 
 		readContent = [fname]( const response_callback_t &f ) {
+			std::cout << "opening file.." << std::endl;
 			std::ifstream ss( fname, std::ios::binary );
 
 			if ( ss.fail() ) {
@@ -122,17 +111,16 @@ public:
 			}
 			size_t partSize = 100;
 			size_t s = 0;
-			do {
-				std::list < char > ret;
-				char retB[partSize];
-				s = ss.readsome ( retB, partSize );
-				for ( unsigned int i = 0; i < s; i++ ) ret.push_back( retB[i] );
-				if ( s == partSize ) {
-					f( ret, false );
-				} else {
-					f( ret, true );
-				}
-			} while ( s == partSize );
+			std::cout << "file opened..." << std::endl;
+			while ( ss.good() ) {
+				std::vector < char > ret( partSize );
+				s = ss.readsome ( ret.data(), partSize );
+				std::cout << "file     ... " << s << std::endl;
+				if (s == 0) break;
+				ret.resize( s );
+				f( ret, false );
+				std::cout << "sent.." << std::endl;
+			} ;
 		};
 	};
 };

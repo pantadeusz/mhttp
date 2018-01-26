@@ -38,7 +38,7 @@ namespace tp {
 namespace http {
 
 using response_status_t = int;
-using response_callback_t = std::function < void ( const std::list < char > &, const response_status_t & ) >;
+using response_callback_t = std::function < void ( const std::vector < char > &, const response_status_t & ) >;
 
 class Response {
 protected:
