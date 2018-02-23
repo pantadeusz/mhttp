@@ -33,7 +33,7 @@ namespace http {
 
 class Socket {
 protected:
-    Socket(){}
+	Socket() {}
 public:
 	std::string _host;
 	std::string _port;
@@ -41,8 +41,8 @@ public:
 
 	int write ( const void * buf, size_t bufsize );
 	int read( void * buf, size_t bufsize );
-    int shutdown();
-    int close();
+	int shutdown();
+	int close();
 
 	std::string getHost() {
 		return _host;

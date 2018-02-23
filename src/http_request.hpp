@@ -55,7 +55,7 @@ public:
 	std::string getPath();
 	size_t getContentLength();
 	std::string getContentString();
-	void setContent(const std::string &s);
+	void setContent( const std::string &s );
 } Request;
 
 }

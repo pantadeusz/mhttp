@@ -30,11 +30,11 @@
 
 
 namespace tp {
-    namespace http {
-    
+namespace http {
+
 
 Request::Request() {
-    //	mime = "application/x-www-form-urlencoded";
+	//	mime = "application/x-www-form-urlencoded";
 }
 
 std::string Request::getContentType () {
@@ -42,57 +42,57 @@ std::string Request::getContentType () {
 }
 
 size_t Request::getContentLength() {
-	if (header.count("content-length") > 0)
-		return std::stoul(header["content-length"]);
+	if ( header.count( "content-length" ) > 0 )
+		return std::stoul( header["content-length"] );
 	else
 		return 0;
 }
-void Request::setContent(const std::string &s) {
-	content = std::vector<char>(s.begin(),s.end());
-	header["content-length"] = std::to_string(s.length());
+void Request::setContent( const std::string &s ) {
+	content = std::vector<char>( s.begin(), s.end() );
+	header["content-length"] = std::to_string( s.length() );
 }
-std::string Request::getContentString() { 
-	return std::string(content.begin(),content.end());
+std::string Request::getContentString() {
+	return std::string( content.begin(), content.end() );
 }
 
 std::map<std::string, std::string> Request::getParams(  ) {
 	std::string uristr = "";
-	if (getContentType() == "application/x-www-form-urlencoded") {
-		uristr = std::string(content.begin(), content.end());
+	if ( getContentType() == "application/x-www-form-urlencoded" ) {
+		uristr = std::string( content.begin(), content.end() );
 	} else {
-		auto i = queryString.find("?");
-		if (i != std::string::npos) {
-			uristr = queryString.substr(i+1);
+		auto i = queryString.find( "?" );
+		if ( i != std::string::npos ) {
+			uristr = queryString.substr( i + 1 );
 		}
 	}
 	std::vector<std::string> pairs;
 	std::map<std::string, std::string> kvr;
 
-	std::regex rex("[&]");
-	pairs = std::vector<std::string>(std::sregex_token_iterator (uristr.begin(), uristr.end(), rex, -1), std::sregex_token_iterator());
-	for (auto &pair : pairs) {
-		auto k = uridecode(pair.substr(0,pair.find("="))); 
-		auto v = uridecode(pair.substr(pair.find("=")+1));
-		kvr[k]=v;
+	std::regex rex( "[&]" );
+	pairs = std::vector<std::string>( std::sregex_token_iterator ( uristr.begin(), uristr.end(), rex, -1 ), std::sregex_token_iterator() );
+	for ( auto &pair : pairs ) {
+		auto k = uridecode( pair.substr( 0, pair.find( "=" ) ) );
+		auto v = uridecode( pair.substr( pair.find( "=" ) + 1 ) );
+		kvr[k] = v;
 	}
 	return kvr;
 }
 
 // // deprecated
 // bool Request::isKeepAlive() {
-	// if (header.count("connection") > 0) {
-		// return header["connection"] == "keep-alive";
-	// }
-	// return false;
+// if (header.count("connection") > 0) {
+// return header["connection"] == "keep-alive";
+// }
+// return false;
 // };
 
 std::string Request::getPath() {
-    std::string ret;
-    auto idx = queryString.find('?');
-    if (idx == std::string::npos) ret = queryString;
-    else ret = queryString.substr(0, idx);
-    if (ret.length() <= 0) ret = "/";
-    return ret;
+	std::string ret;
+	auto idx = queryString.find( '?' );
+	if ( idx == std::string::npos ) ret = queryString;
+	else ret = queryString.substr( 0, idx );
+	if ( ret.length() <= 0 ) ret = "/";
+	return ret;
 };
 
 

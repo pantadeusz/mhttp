@@ -208,11 +208,22 @@ Response Http::processRequests( const Request req ) {
 	Response response; // odpowiedz
 	try {
 		response = handler( requ ); ///< actual response prepare
-	} catch ( std::exception &e ) {
+	} catch ( std::runtime_error &e ) {
+		std::stringstream responseStream;
+		responseStream << "<p>Error std::runtime_error: " << std::string( e.what() ) << "</p>" << std::endl;
+		responseStream << "<p>path: " << requ.getPath() << "</p>" << std::endl;
+		response =  ResponseFactory::response( responseStream.str(), 500, std::string( e.what() ) );
+	} catch ( const ifstream::failure& e ) {
 		std::stringstream responseStream;
 		responseStream << "<p>Error: " << std::string( e.what() ) << "</p>" << std::endl;
 		responseStream << "<p>path: " << requ.getPath() << "</p>" << std::endl;
-		response =  ResponseFactory::response( responseStream.str(), 404,  "selected file not found" );
+		responseStream << "<p>file reading exception.</p>" << std::endl;
+		response =  ResponseFactory::response( responseStream.str(), 404,  "selected file not found or file opening error" );
+	} catch ( std::exception &e ) {
+		std::stringstream responseStream;
+		responseStream << "<p>Error std::exception: " << std::string( e.what() ) << "</p>" << std::endl;
+		responseStream << "<p>path: " << requ.getPath() << "</p>" << std::endl;
+		response =  ResponseFactory::response( responseStream.str(), 500,  "selected file not found" );
 	} catch ( ... ) {
 		response =  ResponseFactory::response( "Unknown server error!", 500,  "internal server error" );
 	}

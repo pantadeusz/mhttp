@@ -29,27 +29,27 @@
 #include <functional>
 
 namespace tp {
-  namespace http {
-  std::vector<char> base64tobin(const std::string &s);
-  std::string filenameProtect(const std::string &s);
+namespace http {
+std::vector<char> base64tobin( const std::string &s );
+std::string filenameProtect( const std::string &s );
 
 
-  // after http://stackoverflow.com/questions/236129/split-a-string-in-c
-  std::vector<std::string> &split( const std::string &s, const char delim, std::vector<std::string> &elems );
+// after http://stackoverflow.com/questions/236129/split-a-string-in-c
+std::vector<std::string> &split( const std::string &s, const char delim, std::vector<std::string> &elems );
 
-  // after http://stackoverflow.com/questions/236129/split-a-string-in-c
-  std::vector<std::string> split( const std::string &s, char delim );
+// after http://stackoverflow.com/questions/236129/split-a-string-in-c
+std::vector<std::string> split( const std::string &s, char delim );
 
-  // after http://stackoverflow.com/
-  std::string trim( const std::string& str, const std::string& whitespace = "\n \t\r" );
+// after http://stackoverflow.com/
+std::string trim( const std::string& str, const std::string& whitespace = "\n \t\r" );
 
-  // returns file modification time
-  unsigned long int getFileModTime(const std::string &fname);
+// returns file modification time
+unsigned long int getFileModTime( const std::string &fname );
 
-  std::string uridecode( const std::string &uristr );  
+std::string uridecode( const std::string &uristr );
 
-	const std::string &getMimeType(const std::string &fileName);
-  
+const std::string &getMimeType( const std::string &fileName );
+
 
 
 

@@ -87,6 +87,7 @@ public:
 		std::string fname = fname_;
 
 		std::ifstream ss( fname, std::ios::binary );
+  		ss.exceptions ( std::ifstream::failbit | std::ifstream::badbit );
 
 		if ( ss.fail() ) {
 			throw std::length_error( "could not read file!" );
@@ -110,7 +111,7 @@ public:
 			while ( ss.good() ) {
 				std::vector < char > ret( partSize );
 				s = ss.readsome ( ret.data(), partSize );
-				if (s == 0) break;
+				if ( s == 0 ) break;
 				ret.resize( s );
 				f( ret, false );
 			};

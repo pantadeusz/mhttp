@@ -84,12 +84,12 @@ std::vector<char> base64tobin( const std::string &s ) {
 		val = ( val << 6 ) + v;
 		bitsCount += 6;
 
-		if (bitsCount >= 24) {
-			ret.push_back( (val >> 16) & 0x0ff );
-			if (pads < 2) ret.push_back( (val >> 8) & 0x0ff );
-			if (pads < 1) ret.push_back( val & 0x0ff );
+		if ( bitsCount >= 24 ) {
+			ret.push_back( ( val >> 16 ) & 0x0ff );
+			if ( pads < 2 ) ret.push_back( ( val >> 8 ) & 0x0ff );
+			if ( pads < 1 ) ret.push_back( val & 0x0ff );
 			val = val >> 24;
-			bitsCount -=24;
+			bitsCount -= 24;
 		}
 	}
 	return ret;
