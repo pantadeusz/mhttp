@@ -68,7 +68,9 @@ int main ( int argc, char **argv ) {
     srv.GET( "/hello", []( Request & req )->Response {
         std::stringstream ss;
         ss << "<p>Hello world!!</p><table>";
-        for ( auto p : req.getParams() ) ss << "<tr><td>" << p.first << "</td><td>" << p.second << "<td></tr>\r\n";
+        for ( auto p : req.getParams() ) {
+            ss << "<tr><td>" << p.first << "</td><td>" << p.second << "<td></tr>\r\n";
+        }
         ss << "</table>";
         return ResponseFactory::response( ss.str(), 200, "OK" );
     } );
@@ -85,8 +87,8 @@ int main ( int argc, char **argv ) {
     std::cin >> i;
     std::cout << "Closing server" << std::endl;
     srv.stop();
-	std::cout << "Closing server - OK" << std::endl;
-	return 0;
+    std::cout << "Closing server - OK" << std::endl;
+    return 0;
 }
 ```
 

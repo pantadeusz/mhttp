@@ -6,15 +6,13 @@
 #cmake -DCMAKE_INSTALL_PREFIX:PATH=./build/mhttp
 
 
-mkdir -p buildmake
-cd buildmake
-cmake –G"Unix Makefiles" ../
+mkdir -p build
+cd build
+cmake -G"Unix Makefiles" ../
 cp -R ../tests ./
 cd ..
 
-
-mkdir -p buildninja/tests buildninja/build
-cd buildninja
-cmake -GNinja ../ 
-cp -R ../tests ./
-cd ..
+echo "Created build in 'build' directory. You can compile using command:"
+echo ""
+echo "cd build; make"
+echo ""
