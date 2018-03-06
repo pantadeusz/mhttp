@@ -44,7 +44,11 @@ int Socket::write ( const void * buf, size_t bufsize ) {
 }
 
 int Socket::read( void * buf, size_t bufsize ) {
-	return ::read( sfd(), ( char * )buf, bufsize );
+	auto ret = ::read( sfd(), ( char * )buf, bufsize );
+	//for (int i = 0; i < ret; i++) {
+	//	std::cout << (((char  *)buf)[i]);// << std::endl;
+	//}
+	return ret;
 }
 
 int Socket::close() {

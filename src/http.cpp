@@ -392,13 +392,56 @@ Response Http::doHttpQuery( Request req ) {
 	if ( header.count( "content-length" ) > 0 ) {
 		size_t s =  std::stoul( header["content-length"] );
 		data = Http::readHttpData( srv, s );
+		//std::cout << "readHttpData: " << std::string( data.begin(), data.end() ) << std::endl;
 	} else {
-		char dataPart[32];
-		int size = srv.read( dataPart, 32 );
-		while ( ( size > 0 )  && ( size <= 32 ) ) {
-			data.insert( data.end(), dataPart, dataPart + size );
-			size = srv.read( dataPart, 32 );
+		if ( header["transfer-encoding"] == "chunked" ) {
+
+			while ( true ) {
+				size_t chunkSize = 0;
+				{
+					std::vector < char > chunkDesc;
+					char dataPart;
+					int size = srv.read( &dataPart, 1 );
+					while ( size == 1 ) {
+						chunkDesc.push_back( dataPart );
+						if ( ( chunkDesc[chunkDesc.size() - 2] == '\r' ) && ( chunkDesc[chunkDesc.size() - 1] == '\n' ) ) break;
+						size = srv.read( &dataPart, 1 );
+					}
+					std::stringstream ss ( std::string( chunkDesc.begin(), chunkDesc.end() ) );
+					ss >> std::hex >> chunkSize;
+					//std::cout << "SIZE!! : " << chunkSize << std::endl;
+				}
+				if ( chunkSize > 0 ) {
+					char dataPart[chunkSize + 1];
+					int size = srv.read( dataPart, chunkSize );
+					if ( size == chunkSize ) {
+						data.insert( data.end(), dataPart, dataPart + size );
+					}
+				} else {
+					break;
+				}
+			}
+			{
+				char dataPart;
+				int size = srv.read( &dataPart, 1 );
+				while ( size == 1 ) {
+					//chunkDesc.push_back( dataPart );
+					//if ( ( chunkDesc[chunkDesc.size() - 2] == '\r' ) && ( chunkDesc[chunkDesc.size() - 1] == '\n' ) ) break;
+					size = srv.read( &dataPart, 1 );
+				}
+			}
+			//std::cout << "CHUNKED!!" << std::endl;
+
+		} else {
+			char dataPart[32];
+			int size = srv.read( dataPart, 32 );
+			while ( ( size > 0 )  && ( size <= 32 ) ) {
+				data.insert( data.end(), dataPart, dataPart + size );
+				size = srv.read( dataPart, 32 );
+			}
 		}
+		//std::cout << "dataPart: " << std::string( data.begin(), data.end() ) << std::endl;
+
 	}
 	std::string rproto;
 	int rcode;

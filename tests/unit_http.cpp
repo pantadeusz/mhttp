@@ -127,6 +127,22 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
         REQUIRE(ss.str()=="Hello in my world b i b&d& ty" );
     }
 
+    // SECTION("post /body with params in body") {
+    //     Request req;
+    //     req.method = "POST";
+    //     req.proto = "HTTP/1.1";
+    //     req.queryString = "/data";
+    //     req.remoteAddress = "localhost:8080";
+    //     req.header["content-type"] = "application/json";
+    //     //req.header["content-length"] = "3";
+    //     req.setContent("{\"value\":123}");
+    //     Response res = Http::doHttpQuery(req);
+    //     std::stringstream ss;
+    //     ss << res;
+    //     REQUIRE(ss.str()=="{\"value\":123}" );
+    // }
+// 
+
     srv.stop();
 
 }
