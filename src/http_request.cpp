@@ -96,5 +96,20 @@ std::string Request::getPath() {
 };
 
 
+namespace RequestFactory {
+Request request( const std::string &url, const std::string &method, const std::string &content, const std::string &content_type ) {
+	std::string remoteAddr( url.begin(), url.begin() + url.find( '/' ) );
+	std::string qstr( url.begin() + url.find( '/' ), url.end() );
+	Request req;
+	req.method = method;
+	req.proto = "HTTP/1.1";
+	req.queryString = qstr;
+	req.remoteAddress = remoteAddr;
+	req.header["content-type"] = content_type;
+	req.header["content-length"] = std::to_string( content.length() );
+	req.setContent( content );
+	return req;
+}
+}
 }
 }

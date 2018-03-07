@@ -208,17 +208,17 @@ Response Http::processRequests( const Request req ) {
 	Response response; // odpowiedz
 	try {
 		response = handler( requ ); ///< actual response prepare
-	} catch ( std::runtime_error &e ) {
-		std::stringstream responseStream;
-		responseStream << "<p>Error std::runtime_error: " << std::string( e.what() ) << "</p>" << std::endl;
-		responseStream << "<p>path: " << requ.getPath() << "</p>" << std::endl;
-		response =  ResponseFactory::response( responseStream.str(), 500, std::string( e.what() ) );
 	} catch ( const ifstream::failure& e ) {
 		std::stringstream responseStream;
 		responseStream << "<p>Error: " << std::string( e.what() ) << "</p>" << std::endl;
 		responseStream << "<p>path: " << requ.getPath() << "</p>" << std::endl;
 		responseStream << "<p>file reading exception.</p>" << std::endl;
 		response =  ResponseFactory::response( responseStream.str(), 404,  "selected file not found or file opening error" );
+	} catch ( std::runtime_error &e ) {
+		std::stringstream responseStream;
+		responseStream << "<p>Error std::runtime_error: " << std::string( e.what() ) << "</p>" << std::endl;
+		responseStream << "<p>path: " << requ.getPath() << "</p>" << std::endl;
+		response =  ResponseFactory::response( responseStream.str(), 500, std::string( e.what() ) );
 	} catch ( std::exception &e ) {
 		std::stringstream responseStream;
 		responseStream << "<p>Error std::exception: " << std::string( e.what() ) << "</p>" << std::endl;
@@ -414,7 +414,7 @@ Response Http::doHttpQuery( Request req ) {
 				if ( chunkSize > 0 ) {
 					char dataPart[chunkSize + 1];
 					int size = srv.read( dataPart, chunkSize );
-					if ( size == chunkSize ) {
+					if ( size == ( int )chunkSize ) {
 						data.insert( data.end(), dataPart, dataPart + size );
 					}
 				} else {

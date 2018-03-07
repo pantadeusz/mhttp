@@ -58,6 +58,10 @@ public:
 	void setContent( const std::string &s );
 } Request;
 
+namespace RequestFactory {
+	Request request(const std::string &url, const std::string &method = "GET", const std::string &content = "", const std::string &content_type = "application/json");
+}
+
 }
 }
 

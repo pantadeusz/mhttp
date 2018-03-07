@@ -101,11 +101,8 @@ TEST_CASE( "http server full requests with ports and so on", "[mhttp][http]" ) {
     }
 
     SECTION("get /t with params") {
-        Request req;
-        req.method = "GET";
-        req.proto = "HTTP/1.1";
-        req.queryString = "/t?name=gerwazy";
-        req.remoteAddress = "localhost:" + std::to_string(port);
+        auto req = RequestFactory::request( std::string("localhost:") + std::to_string(port)+"/t?name=gerwazy");
+
         Response res = Http::doHttpQuery(req);
         std::stringstream ss;
         ss << res;
