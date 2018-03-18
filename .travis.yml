@@ -13,7 +13,7 @@ install:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
 
 script:
- - ./configure && cd buildmake && make check && cd .. && ./buildmake/mhttp_tests -s
+ - mkdir -p build && cd build && cmake .. && make && make check && cd .. && ./build/mhttp_tests -s
 
 # after_success:
 #  - cat  tests.log | grep assertions
