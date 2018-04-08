@@ -102,8 +102,3 @@ You can use C++14 features, for shorter notation of lambdas:
         req.queryString = "/index.html";
     });
 ```
-
-
-### donations
-
-I accept donations in BTC at bc1q2rs40jcs9849hyph97am48xewzdf8ctfr6hsmx
