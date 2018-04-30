@@ -29,7 +29,7 @@ int main ( int argc, char **argv ) {
 		}
 	}
 	{
-		Http srv( "localhost", 8090, true );
+		Http srv( "localhost", 8090, 1024 );
 		bool loggedin = false;
 
 		srv.filter_GET( "/", [&]( Request & req )->void {

@@ -256,7 +256,7 @@ int Http::acceptConnection() {
 
 	try {
 		auto clientsocket = listeningSocket.accept();
-		auto cleanupWorkers = [&,this](){
+		auto cleanupWorkers = [&, this](){
 			std::lock_guard<std::mutex> guard( workers_mutex );
 			for ( auto it = workers.begin(); it != workers.end(); ) {
 				auto status = ( *it ).wait_for( std::chrono::milliseconds( 0 ) );
@@ -269,15 +269,16 @@ int Http::acceptConnection() {
 				}
 			}
 		};
-		bool toomany = true;
-		while (toomany) {
-			cleanupWorkers();
-			{
-				std::lock_guard<std::mutex> guard( workers_mutex );
-				if (workers.size() > 100) toomany = true;
-				else toomany = false;
-			}
-		}
+		cleanupWorkers();
+		//bool toomany = true;
+		//while (toomany) {
+		//	cleanupWorkers();
+		//	{
+		//		std::lock_guard<std::mutex> guard( workers_mutex );
+		//		if (workers.size() > 1024) toomany = true;
+		//		else toomany = false;
+		//	}
+		//}
 		{
 			std::lock_guard<std::mutex> guard( workers_mutex );
 			workers.push_back( std::async( std::launch::async, [this, clientsocket]()->int{
@@ -315,7 +316,7 @@ Http::Http( std::string hostname, int port, int async ) : listeningSocket( hostn
 	filterMappings["POST"] = std::vector< std::pair < std::regex, t_filterHandler > > ();
 	filterMappings["DELETE"] = std::vector< std::pair < std::regex, t_filterHandler > > ();
 	signal( SIGPIPE, SIG_IGN );
-	workers.reserve( 128 );
+	//workers.reserve( 128 );
 	stdlog( "Web server at " + hostname + " : " + std::to_string( port ) );
 
 }

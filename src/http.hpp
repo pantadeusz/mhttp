@@ -34,6 +34,7 @@
 #include <functional>
 #include <map>
 #include <vector>
+#include <list>
 #include <future>
 #include <utility>
 #include <regex>
@@ -57,7 +58,7 @@ private:
 
 	/// tasks
 	std::mutex workers_mutex;
-	std::vector< std::future < int > > workers;
+	std::list< std::future < int > > workers;
 
 	// accepting socket
 	ListeningSocket listeningSocket;
@@ -160,7 +161,7 @@ public:
 	/**
 	 * constructor creates working server
 	*/
-	Http( std::string hostname = "localhost", int port = 8080, int async = false );
+	Http( std::string hostname = "localhost", int port = 8080, int async = 128 );
 	virtual ~Http ();
 
 	/**
