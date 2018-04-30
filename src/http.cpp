@@ -256,7 +256,7 @@ int Http::acceptConnection() {
 
 	try {
 		auto clientsocket = listeningSocket.accept();
-		{
+		auto cleanupWorkers = [&,this](){
 			std::lock_guard<std::mutex> guard( workers_mutex );
 			for ( auto it = workers.begin(); it != workers.end(); ) {
 				auto status = ( *it ).wait_for( std::chrono::milliseconds( 0 ) );
@@ -268,8 +268,16 @@ int Http::acceptConnection() {
 					++it;
 				}
 			}
+		};
+		bool toomany = true;
+		while (toomany) {
+			cleanupWorkers();
+			{
+				std::lock_guard<std::mutex> guard( workers_mutex );
+				if (workers.size() > 100) toomany = true;
+				else toomany = false;
+			}
 		}
-
 		{
 			std::lock_guard<std::mutex> guard( workers_mutex );
 			workers.push_back( std::async( std::launch::async, [this, clientsocket]()->int{
